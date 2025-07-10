@@ -10,8 +10,6 @@ class UserRepositoryImpl(
 
 ) : UserRepository {
 
-
-
     override suspend fun insertUser(user: User) {
         userDao.insertUser(user)
     }

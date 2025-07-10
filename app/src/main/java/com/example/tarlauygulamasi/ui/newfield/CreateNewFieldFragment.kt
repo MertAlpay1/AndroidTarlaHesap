@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.core.graphics.toColor
 import com.example.tarlauygulamasi.R
+import com.example.tarlauygulamasi.databinding.FragmentCreateNewFieldBinding
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -30,16 +31,14 @@ import dagger.hilt.EntryPoint
 //Geri tuşu stack mantığında çalışsın
 class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
 
+    private var _binding: FragmentCreateNewFieldBinding?=null
+    private val binding get() = _binding!!
+
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
     private lateinit var LatLngList: MutableList<LatLng>
     private lateinit var  markerList: MutableList<Marker?>
     private  var  polygon: Polygon? = null
-    private lateinit var drawBtn: Button
-    private lateinit var undoBtn:Button
-    private lateinit var saveBtn:Button
-    private lateinit var areaText: TextView
-    private lateinit var donumAreaText: TextView
     private var isDrawn=false
 
     private val viewModel: CreateNewFieldViewModel by viewModels()
@@ -48,20 +47,36 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
         super.onCreate(savedInstanceState)
     }
 
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+
+        LatLngList = mutableListOf()
+        markerList = mutableListOf()
+
+
+        _binding = FragmentCreateNewFieldBinding.inflate(inflater, container, false)
+
+
+        binding.map.onCreate(savedInstanceState)
+        binding.map.getMapAsync(this)
+
+        val view=binding.root
+
+
+        return view
+    }
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //view binder
-        drawBtn=view.findViewById<Button>(R.id.draw_button)
-        undoBtn=view.findViewById<Button>(R.id.undo_button)
-        areaText = view.findViewById<TextView>(R.id.area)
-        donumAreaText = view.findViewById<TextView>(R.id.areaDonum)
-        saveBtn=view.findViewById<Button>(R.id.save_button)
 
-        drawBtn.setOnClickListener {
+        binding.drawButton.setOnClickListener {
             isDrawn=true
             draw()
         }
-        undoBtn.setOnClickListener {
+        binding.undoButton.setOnClickListener {
 
             if (markerList.isNotEmpty()) {
                 val removedMarker = markerList.removeAt(markerList.size - 1)
@@ -76,7 +91,7 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
             if(isDrawn) draw()
         }
 
-        saveBtn.setOnClickListener {
+        binding.saveButton.setOnClickListener {
 
             //Veri tabanına kaydet
 
@@ -85,25 +100,6 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
 
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-
-        LatLngList = mutableListOf()
-        markerList = mutableListOf()
-
-
-        val view= inflater.inflate(R.layout.fragment_create_new_field, container, false)
-
-        val mapView=view.findViewById<MapView>(R.id.map)
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync(this)
-
-        return view
-
-
-    }
 
     override fun onMapReady(gMap: GoogleMap){
 
@@ -160,8 +156,8 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
         val area= SphericalUtil.computeArea(LatLngList)
         val donumArea=area/1000
 
-        areaText.text = String.format("%.2f m²", area)
-        donumAreaText.text = String.format("%.2f dönüm", donumArea)
+        binding.area.text = String.format("%.2f m²", area)
+        binding.areaDonum.text = String.format("%.2f dönüm", donumArea)
     }
 
 

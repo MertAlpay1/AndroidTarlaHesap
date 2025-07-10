@@ -9,8 +9,10 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.tarlauygulamasi.R
+import com.example.tarlauygulamasi.databinding.FragmentSignupBinding
 import com.example.tarlauygulamasi.util.resource.Resource
 import com.example.tarlauygulamasi.ui.register.SignupViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -18,42 +20,35 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class SignupFragment : Fragment() {
 
+    private var _binding: FragmentSignupBinding?=null
+    private val binding get()=_binding!!
     private val viewModel: SignupViewModel by viewModels()
-    private lateinit var username: EditText
-    private lateinit var email: EditText
-    private lateinit var password: EditText
-    private lateinit var confirmPassword: EditText
-    private lateinit var signupBtn: Button
-    private lateinit var returnBtn: TextView
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_signup, container, false)
+        _binding= FragmentSignupBinding.inflate(inflater, container, false)
+        val view=binding.root
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        username = view.findViewById(R.id.username)
-        email = view.findViewById(R.id.eMail)
-        password = view.findViewById(R.id.password)
-        confirmPassword = view.findViewById(R.id.confirmPassword)
-        signupBtn = view.findViewById(R.id.signupButton)
-        returnBtn = view.findViewById(R.id.returnLoginPage)
 
-        email.setText(viewModel.signupEmailInput.value ?: "")
-        password.setText(viewModel.signupPasswordInput.value ?: "")
-        username.setText(viewModel.signupUsernameInput.value ?: "")
-        confirmPassword.setText(viewModel.signupConfirmPasswordInput.value ?: "")
+        binding.username.setText(viewModel.signupUsernameInput.value ?: "")
+        binding.eMail.setText(viewModel.signupEmailInput.value ?: "")
+        binding.password.setText(viewModel.signupPasswordInput.value ?: "")
+        binding.confirmPassword.setText(viewModel.signupConfirmPasswordInput.value ?: "")
 
-        signupBtn.setOnClickListener {
+        binding.signupButton.setOnClickListener {
 
-            val usernameText = username.text.toString().trim()
-            val emailText = email.text.toString().trim()
-            val passwordText = password.text.toString().trim()
-            val confirmPasswordText = confirmPassword.text.toString().trim()
+            val usernameText = binding.username.text.toString().trim()
+            val emailText =  binding.eMail.text.toString().trim()
+            val passwordText =  binding.password.text.toString().trim()
+            val confirmPasswordText = binding.confirmPassword.text.toString().trim()
 
             if (usernameText.isEmpty() || emailText.isEmpty() || passwordText.isEmpty() || confirmPasswordText.isEmpty()) {
                 Toast.makeText(requireContext(), "Tüm alanları doldurun", Toast.LENGTH_SHORT).show()
@@ -78,33 +73,45 @@ class SignupFragment : Fragment() {
             viewModel.register(usernameText, emailText, passwordText)
         }
 
-        returnBtn.setOnClickListener {
-            viewModel.signupEmailInput.value = email.text.toString()
-            viewModel.signupPasswordInput.value = password.text.toString()
-            viewModel.signupUsernameInput.value = username.text.toString()
-            viewModel.signupConfirmPasswordInput.value = confirmPassword.text.toString()
+        binding.returnLoginPage.setOnClickListener {
+            viewModel.signupEmailInput.value = binding.eMail.text.toString()
+            viewModel.signupPasswordInput.value = binding.password.text.toString()
+            viewModel.signupUsernameInput.value = binding.username.text.toString()
+            viewModel.signupConfirmPasswordInput.value = binding.confirmPassword.text.toString()
             findNavController().navigate(R.id.action_signupFragment_to_loginFragment)
         }
 
-        viewModel.registerResult.observe(viewLifecycleOwner){ result->
 
-            when(result) {
-                is Resource.Success -> {
-                    Toast.makeText(requireContext(), "Kayıt Başarılı", Toast.LENGTH_SHORT).show()
 
-                    findNavController().navigate(R.id.action_signupFragment_to_homeFragment)
+            lifecycleScope.launchWhenStarted {
+                viewModel.registerResult.collect {  result ->
+                when (result) {
+                    is Resource.Success -> {
+                        Toast.makeText(requireContext(), "Kayıt Başarılı", Toast.LENGTH_SHORT).show()
+                        clearInputs()
+                        findNavController().navigate(R.id.action_signupFragment_to_homeFragment)
 
+
+                    }
+                    is Resource.Error -> {
+                        Toast.makeText(requireContext(), result.message ?: "Hata", Toast.LENGTH_SHORT).show()
+                    }
+                    is Resource.Loading -> {
+
+                    }
+                  }
                 }
-                is Resource.Error -> {
-                    Toast.makeText(requireContext(), result.message ?: "Hata", Toast.LENGTH_SHORT).show()
-                }
-                is Resource.Loading -> {
 
-                }
+
+
             }
 
-
-        }
-
     }
+
+        fun clearInputs() {
+           viewModel.signupEmailInput.value = ""
+           viewModel.signupPasswordInput.value = ""
+           viewModel.signupUsernameInput.value = ""
+           viewModel.signupConfirmPasswordInput.value = ""
+         }
 }
