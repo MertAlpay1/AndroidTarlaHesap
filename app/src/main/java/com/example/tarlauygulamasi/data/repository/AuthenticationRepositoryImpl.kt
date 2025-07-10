@@ -1,14 +1,15 @@
 package com.example.tarlauygulamasi.data.repository
 
-import android.util.Log
 import com.example.tarlauygulamasi.data.entity.User
 import com.example.tarlauygulamasi.domain.repository.AuthenticationRepository
 import com.example.tarlauygulamasi.domain.repository.UserRepository
 import com.example.tarlauygulamasi.util.resource.Resource
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class AuthenticationRepositoryImpl @Inject constructor(
@@ -16,50 +17,31 @@ class AuthenticationRepositoryImpl @Inject constructor(
     private val userRepository: UserRepository
 ): AuthenticationRepository {
 
-    override fun register(username:String, email:String, password: String, callback:(Resource<Boolean>) -> Unit )   {
+    override fun register(username:String, email:String, password: String): Flow<Resource<Boolean>> = flow  {
+        try {
+            val result=auth.createUserWithEmailAndPassword(email,password)
 
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(){ task ->
-                if (task.isSuccessful) {
-                    val uid = auth.currentUser?.uid ?: return@addOnCompleteListener
-                    val user = User(uid, username, email)
+            val uid = auth.currentUser?.uid ?: throw Exception("Kullanıcı kimliği oluşturulamadı")
+            val user = User(uid, username, email)
 
+            userRepository.insertUser(user)
+            emit(Resource.Success(true))
+        }
+        catch (e: Exception){
+            emit(Resource.Error(e.localizedMessage ?: "Yetkilendirme sağlanamadı"))
+        }
 
-                    CoroutineScope(Dispatchers.IO).launch {
-                        try {
-                            userRepository.insertUser(user)
-                            callback(Resource.Success(true))
-                        } catch (e: Exception) {
-                            callback(Resource.Error("Veritabanına eklenemedi: ${e.localizedMessage}"))
-                        }
-                    }
+    }.flowOn(Dispatchers.IO) //Veri tabanı için
 
 
-                    //Kaydet
+    override fun login(email: String, password: String) : Flow<Resource<Boolean>> = flow {
+        try{
+            val result = auth.signInWithEmailAndPassword(email, password).await()
+            emit(Resource.Success(true))
 
-                } else {
-                    Log.w("register", "Hesap oluşturulamadı", task.exception)
-                    callback(Resource.Error(task.exception?.localizedMessage ?: "Yetkilendirme sağlanamadı"))
-                }
-            }
-
-
-
-    }
-
-
-    override fun login(email: String, password: String, callback: (Resource<Boolean>) -> Unit) {
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener() { task ->
-                if (task.isSuccessful) {
-                    Log.d("login", "Giriş başarılı")
-                    val user = auth.currentUser
-                    callback(Resource.Success(true))
-                } else {
-                    Log.w("login", "Yanlış e-posta veya şifre", task.exception)
-                    callback(Resource.Error(task.exception?.localizedMessage ?: "Yanlış e-posta veya şifre"))
-                }
-            }
+        }catch (e: Exception){
+            emit(Resource.Error(e.localizedMessage?:"Giriş Yapılamadı"))
+        }
     }
 
 

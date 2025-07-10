@@ -9,7 +9,9 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.tarlauygulamasi.R
 import com.example.tarlauygulamasi.databinding.FragmentLoginBinding
@@ -23,7 +25,7 @@ class LoginFragment : Fragment() {
     private var _binding : FragmentLoginBinding?=null
     private val binding get()=_binding!!
 
-    private val viewModel: LoginViewModel by viewModels()
+    private val viewModel: LoginViewModel by activityViewModels()
 
 
     override fun onCreateView(
@@ -33,7 +35,7 @@ class LoginFragment : Fragment() {
 
         _binding= FragmentLoginBinding.inflate(inflater, container, false)
         val view=binding.root
-        
+
         return view
     }
 
@@ -45,7 +47,7 @@ class LoginFragment : Fragment() {
         binding.password.setText(viewModel.loginPasswordInput.value ?: "")
 
         //direkt giriş için
-        viewModel.login("mert@gmail.com", "123456")
+        //viewModel.login("mert@gmail.com", "123456")
 
 
         binding.loginButton.setOnClickListener {
@@ -67,25 +69,33 @@ class LoginFragment : Fragment() {
 
             findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
         }
-        viewModel.loginResult.observe(viewLifecycleOwner) { result ->
-            when (result) {
 
-                is Resource.Success -> {
-                    Toast.makeText(requireContext(), "Giriş başarılı", Toast.LENGTH_SHORT).show()
+        lifecycleScope.launchWhenStarted {
+            viewModel.loginResult.collect { result ->
+                when (result) {
 
-                    //Uygulama girişine yönlendir
-                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+                    is Resource.Success -> {
+                        Toast.makeText(requireContext(), "Giriş başarılı", Toast.LENGTH_SHORT).show()
+                        clearInputs()
+                        findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+
+                    }
+
+                    is Resource.Error -> {
+                        Toast.makeText(requireContext(), result.message ?: "Hata", Toast.LENGTH_SHORT).show()
+                    }
+
+                    is Resource.Loading -> {
+
+                    }
 
                 }
-                is Resource.Error -> {
-                    Toast.makeText(requireContext(), result.message ?: "Hata", Toast.LENGTH_SHORT).show()
-                }
-                is Resource.Loading -> {
-
-                }
-
             }
         }
+    }
+    fun clearInputs() {
+        viewModel.loginEmailInput.value = ""
+        viewModel.loginPasswordInput.value = ""
     }
 
 

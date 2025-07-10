@@ -9,6 +9,7 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.tarlauygulamasi.R
 import com.example.tarlauygulamasi.databinding.FragmentSignupBinding
@@ -80,25 +81,37 @@ class SignupFragment : Fragment() {
             findNavController().navigate(R.id.action_signupFragment_to_loginFragment)
         }
 
-        viewModel.registerResult.observe(viewLifecycleOwner){ result->
 
-            when(result) {
-                is Resource.Success -> {
-                    Toast.makeText(requireContext(), "Kayıt Başarılı", Toast.LENGTH_SHORT).show()
 
-                    findNavController().navigate(R.id.action_signupFragment_to_homeFragment)
+            lifecycleScope.launchWhenStarted {
+                viewModel.registerResult.collect {  result ->
+                when (result) {
+                    is Resource.Success -> {
+                        Toast.makeText(requireContext(), "Kayıt Başarılı", Toast.LENGTH_SHORT).show()
+                        clearInputs()
+                        findNavController().navigate(R.id.action_signupFragment_to_homeFragment)
 
+
+                    }
+                    is Resource.Error -> {
+                        Toast.makeText(requireContext(), result.message ?: "Hata", Toast.LENGTH_SHORT).show()
+                    }
+                    is Resource.Loading -> {
+
+                    }
+                  }
                 }
-                is Resource.Error -> {
-                    Toast.makeText(requireContext(), result.message ?: "Hata", Toast.LENGTH_SHORT).show()
-                }
-                is Resource.Loading -> {
 
-                }
+
+
             }
 
-
-        }
-
     }
+
+        fun clearInputs() {
+           viewModel.signupEmailInput.value = ""
+           viewModel.signupPasswordInput.value = ""
+           viewModel.signupUsernameInput.value = ""
+           viewModel.signupConfirmPasswordInput.value = ""
+         }
 }

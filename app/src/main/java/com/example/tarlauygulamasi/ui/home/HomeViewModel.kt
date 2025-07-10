@@ -14,9 +14,7 @@ class HomeViewModel @Inject constructor(
 
 
     fun signout(){
-
         signoutUseCase()
-
     }
 
 
