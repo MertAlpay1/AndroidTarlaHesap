@@ -12,17 +12,17 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import com.example.tarlauygulamasi.R
+import com.example.tarlauygulamasi.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
 
-
-    private lateinit var newFieldBtn : TextView
-
-    private lateinit var nllBtn : TextView
+    private var _binding : FragmentHomeBinding?=null
+    private val binding get()=_binding!!
 
     private val viewModel: HomeViewModel by viewModels()
 
@@ -31,22 +31,26 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
-        return inflater.inflate(R.layout.fragment_home, container, false)
+
+
+        _binding=FragmentHomeBinding.inflate(inflater,container,false)
+        val view=binding.root
+
+        return view
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val toolbar=view.findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar)
-        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
-        //Mevcut kullanıcı alınacak
+
+        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
+
         val username = "rifki"
+
         (requireActivity() as AppCompatActivity).supportActionBar?.title = username
 
-        newFieldBtn=view.findViewById<TextView>(R.id.newfieldButton)
 
-
-
-        newFieldBtn.setOnClickListener {
+        binding.newfieldButton.setOnClickListener {
 
             findNavController().navigate(R.id.action_homeFragment_to_createNewFieldFragment)
 
