@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ui.home.HomeFragment"
+    android:background="@drawable/login_background">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:id="@+id/toptoolbar">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:titleTextColor="@android:color/white"
+        tools:title="Tarla Uygulaması"
+        app:titleMarginStart="30dp"
+        app:titleTextColor="@color/black"
+        android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"
+        app:popupTheme="@style/Theme.AppCompat.Light"/>
+
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toptoolbar"
+        android:orientation="horizontal"
+        android:padding="20dp"
+        >
+
+        <TextView
+            android:id="@+id/newfieldButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/yeni_tarla_olustur"
+            android:background="@drawable/rounded_login_background"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:textColor="@color/blue"
+            android:padding="10dp"
+            />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Boş"
+            android:background="@drawable/rounded_login_background"
+            android:textColor="@color/blue"
+            android:textSize="18sp"
+            android:gravity="center"
+            android:layout_marginStart="20dp"
+            android:padding="10dp"/>
+
+
+
+    </LinearLayout>
+
+
+
+
+</RelativeLayout>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:padding="16dp"
+    android:background="@drawable/login_background"
+    tools:context=".ui.register.SignupFragment">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@drawable/rounded_login_background"
+        android:padding="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="@string/signup"
+            android:textStyle="bold"
+            android:textColor="@color/blue"
+            android:textSize="28sp"
+            android:padding="22dp"/>
+
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/username"
+            android:background="@drawable/custom_edittext"
+            android:textColorHint="@color/blue"
+            android:textStyle="bold"
+            android:textColor="@color/blue"
+            android:textSize="20sp"
+            android:padding="26dp"
+            android:inputType="text"
+            android:layout_marginTop="20dp"
+            android:id="@+id/username"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/e_mail"
+            android:background="@drawable/custom_edittext"
+            android:textColorHint="@color/blue"
+            android:textStyle="bold"
+            android:textColor="@color/blue"
+            android:textSize="20sp"
+            android:padding="26dp"
+            android:inputType="textEmailAddress"
+            android:layout_marginTop="20dp"
+            android:id="@+id/eMail"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/password"
+            android:background="@drawable/custom_edittext"
+            android:textColor="@color/blue"
+            android:textStyle="bold"
+            android:textColorHint="@color/blue"
+            android:textSize="20sp"
+            android:padding="26dp"
+            android:inputType="textPassword"
+            android:layout_marginTop="20dp"
+            android:id="@+id/password"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/confirm_password"
+            android:background="@drawable/custom_edittext"
+            android:textColor="@color/blue"
+            android:textStyle="bold"
+            android:textColorHint="@color/blue"
+            android:textSize="20sp"
+            android:padding="26dp"
+            android:inputType="textPassword"
+            android:layout_marginTop="20dp"
+            android:id="@+id/confirmPassword"/>
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/signup_button"
+            android:textSize="22sp"
+            android:textColor="@color/white"
+            android:backgroundTint="@color/black"
+            android:padding="12dp"
+            android:layout_marginTop="20dp"
+            android:id="@+id/signupButton"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="@string/return_login_page_button"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textAlignment="center"
+            android:layout_marginTop="10dp"
+            android:id="@+id/returnLoginPage"/>
+
+
+    </LinearLayout>
+
+
+
+
+</RelativeLayout>

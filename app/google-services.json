@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "808603541202",
+    "project_id": "tarlaalanhesaplamaproje",
+    "storage_bucket": "tarlaalanhesaplamaproje.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:808603541202:android:65e4269f91833d7b2fd70b",
+        "android_client_info": {
+          "package_name": "com.example.tarlauygulamasi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCB-x6r7WSY746m5rFqiw1StA_QAXME11s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
