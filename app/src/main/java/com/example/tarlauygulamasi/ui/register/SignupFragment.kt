@@ -89,16 +89,16 @@ class SignupFragment : Fragment() {
         viewModel.registerResult.observe(viewLifecycleOwner){ result->
 
             when(result) {
-                is Resource.Error -> {
+                is Resource.Success -> {
                     Toast.makeText(requireContext(), "Kayıt Başarılı", Toast.LENGTH_SHORT).show()
 
                     findNavController().navigate(R.id.action_signupFragment_to_homeFragment)
 
                 }
-                is Resource.Loading -> {
+                is Resource.Error -> {
                     Toast.makeText(requireContext(), result.message ?: "Hata", Toast.LENGTH_SHORT).show()
                 }
-                is Resource.Success -> {
+                is Resource.Loading -> {
 
                 }
             }

@@ -49,12 +49,6 @@ class LoginFragment : Fragment() {
         //direkt giriş için
         viewModel.login("mert@gmail.com", "123456")
 
-        /*
-        firebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
-        firebaseAnalytics.logEvent("test_event", null)
-        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, null)
-        sonradak kaldırılacak
-         */
 
         loginBtn.setOnClickListener {
             val emailText = email.text.toString().trim()

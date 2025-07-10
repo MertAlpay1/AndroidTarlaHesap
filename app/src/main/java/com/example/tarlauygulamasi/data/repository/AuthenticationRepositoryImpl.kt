@@ -1,16 +1,19 @@
 package com.example.tarlauygulamasi.data.repository
 
 import android.util.Log
-import com.example.tarlauygulamasi.data.model.UserDto
+import com.example.tarlauygulamasi.data.entity.User
 import com.example.tarlauygulamasi.domain.repository.AuthenticationRepository
+import com.example.tarlauygulamasi.domain.repository.UserRepository
 import com.example.tarlauygulamasi.util.resource.Resource
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AuthenticationRepositoryImpl @Inject constructor(
     private val auth : FirebaseAuth,
-    private val db: FirebaseFirestore
+    private val userRepository: UserRepository
 ): AuthenticationRepository {
 
     override fun register(username:String, email:String, password: String, callback:(Resource<Boolean>) -> Unit )   {
@@ -19,15 +22,20 @@ class AuthenticationRepositoryImpl @Inject constructor(
             .addOnCompleteListener(){ task ->
                 if (task.isSuccessful) {
                     val uid = auth.currentUser?.uid ?: return@addOnCompleteListener
-                    val user = UserDto(username, email)
+                    val user = User(uid, username, email)
 
-                    db.collection("Users").document(uid).set(user)
-                        .addOnSuccessListener {
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            userRepository.insertUser(user)
                             callback(Resource.Success(true))
+                        } catch (e: Exception) {
+                            callback(Resource.Error("Veritabanına eklenemedi: ${e.localizedMessage}"))
                         }
-                        .addOnFailureListener {
-                            callback(Resource.Error("Firestore hatası"))
-                        }
+                    }
+
+
+                    //Kaydet
 
                 } else {
                     Log.w("register", "Hesap oluşturulamadı", task.exception)
