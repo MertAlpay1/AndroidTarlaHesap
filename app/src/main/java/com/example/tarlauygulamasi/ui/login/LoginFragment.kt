@@ -33,7 +33,7 @@ class LoginFragment : Fragment() {
 
         _binding= FragmentLoginBinding.inflate(inflater, container, false)
         val view=binding.root
-
+        
         return view
     }
 
