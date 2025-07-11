@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.tarlauygulamasi.data.dao.UserDao
-import com.example.tarlauygulamasi.data.entity.User
+import com.example.tarlauygulamasi.data.locale.entity.User
 
 @Database(
     entities = [User::class],

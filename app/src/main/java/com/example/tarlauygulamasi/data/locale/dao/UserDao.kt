@@ -1,10 +1,9 @@
 package com.example.tarlauygulamasi.data.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.tarlauygulamasi.data.entity.User
+import com.example.tarlauygulamasi.data.locale.entity.User
 
 @Dao
 interface UserDao {

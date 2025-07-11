@@ -3,14 +3,15 @@ package com.example.tarlauygulamasi.di
 import android.content.Context
 import com.example.tarlauygulamasi.data.dao.UserDao
 import com.example.tarlauygulamasi.data.database.UserDatabase
+import com.example.tarlauygulamasi.data.locale.dao.FieldDao
+import com.example.tarlauygulamasi.data.locale.database.FieldDatabase
 import com.example.tarlauygulamasi.data.repository.AuthenticationRepositoryImpl
+import com.example.tarlauygulamasi.data.repository.FieldRepositoryImpl
 import com.example.tarlauygulamasi.data.repository.UserRepositoryImpl
 import com.example.tarlauygulamasi.domain.repository.AuthenticationRepository
+import com.example.tarlauygulamasi.domain.repository.FieldRepository
 import com.example.tarlauygulamasi.domain.repository.UserRepository
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,6 +49,24 @@ object AppModule {
     fun provideUserRepository(userDao: UserDao): UserRepository {
         return UserRepositoryImpl(userDao)
     }
+
+    @Provides
+    @Singleton
+    fun provideFieldDatabase(@ApplicationContext context: Context): FieldDatabase{
+        return FieldDatabase.getInstance(context)
+    }
+
+    @Singleton
+    @Provides
+    fun provideFieldDao(db: FieldDatabase): FieldDao=db.fieldDao()
+
+    @Singleton
+    @Provides
+    fun provedeFieldRepository(fieldDao: FieldDao): FieldRepository{
+        return FieldRepositoryImpl(fieldDao)
+    }
+
+
 
 
 }

@@ -1,4 +1,4 @@
-package com.example.tarlauygulamasi.data.entity
+package com.example.tarlauygulamasi.data.locale.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

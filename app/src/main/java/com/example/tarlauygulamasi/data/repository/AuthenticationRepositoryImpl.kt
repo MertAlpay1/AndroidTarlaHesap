@@ -1,6 +1,6 @@
 package com.example.tarlauygulamasi.data.repository
 
-import com.example.tarlauygulamasi.data.entity.User
+import com.example.tarlauygulamasi.data.locale.entity.User
 import com.example.tarlauygulamasi.domain.repository.AuthenticationRepository
 import com.example.tarlauygulamasi.domain.repository.UserRepository
 import com.example.tarlauygulamasi.util.resource.Resource

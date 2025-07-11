@@ -11,13 +11,16 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.example.tarlauygulamasi.R
 import com.example.tarlauygulamasi.databinding.FragmentLoginBinding
 import com.example.tarlauygulamasi.util.resource.Resource
 import com.example.tarlauygulamasi.ui.login.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class LoginFragment : Fragment() {
@@ -47,7 +50,7 @@ class LoginFragment : Fragment() {
         binding.password.setText(viewModel.loginPasswordInput.value ?: "")
 
         //direkt giriş için
-        //viewModel.login("mert@gmail.com", "123456")
+        viewModel.login("mert@gmail.com", "123456")
 
 
         binding.loginButton.setOnClickListener {
@@ -70,28 +73,32 @@ class LoginFragment : Fragment() {
             findNavController().navigate(R.id.action_loginFragment_to_signupFragment)
         }
 
-        lifecycleScope.launchWhenStarted {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
             viewModel.loginResult.collect { result ->
-                when (result) {
-
-                    is Resource.Success -> {
-                        Toast.makeText(requireContext(), "Giriş başarılı", Toast.LENGTH_SHORT).show()
-                        clearInputs()
-                        findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
-
-                    }
-
-                    is Resource.Error -> {
-                        Toast.makeText(requireContext(), result.message ?: "Hata", Toast.LENGTH_SHORT).show()
-                    }
-
-                    is Resource.Loading -> {
-
-                    }
+            when (result) {
+                is Resource.Success -> {
+                    Toast.makeText(requireContext(), "Giriş başarılı", Toast.LENGTH_SHORT).show()
+                    clearInputs()
+                    viewModel.loginResult.value = Resource.Loading()
+                    findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
 
                 }
+
+                is Resource.Error -> {
+                    Toast.makeText(requireContext(), result.message ?: "Hata", Toast.LENGTH_SHORT).show()
+                }
+
+                is Resource.Loading -> {
+
+                }
+
             }
+         }
         }
+
+        }
+
     }
     fun clearInputs() {
         viewModel.loginEmailInput.value = ""

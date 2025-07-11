@@ -1,7 +1,7 @@
 package com.example.tarlauygulamasi.data.repository
 
 import com.example.tarlauygulamasi.data.dao.UserDao
-import com.example.tarlauygulamasi.data.entity.User
+import com.example.tarlauygulamasi.data.locale.entity.User
 import com.example.tarlauygulamasi.domain.repository.UserRepository
 
 class UserRepositoryImpl(

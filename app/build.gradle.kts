@@ -79,9 +79,12 @@ dependencies {
     val room_version = "2.7.2"
     implementation("androidx.room:room-ktx:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
-
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    //gson
+    implementation("com.google.code.gson:gson:2.8.8")
+
 
 
 
