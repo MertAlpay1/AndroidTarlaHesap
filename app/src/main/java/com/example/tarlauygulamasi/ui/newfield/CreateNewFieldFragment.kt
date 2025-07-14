@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.core.graphics.toColor
+import androidx.navigation.fragment.findNavController
 import com.example.tarlauygulamasi.R
 import com.example.tarlauygulamasi.databinding.FragmentCreateNewFieldBinding
 import com.google.android.gms.maps.GoogleMap
@@ -89,6 +90,12 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
             if(LatLngList.size<1) isDrawn=false
 
             if(isDrawn) draw()
+
+            if(markerList.isEmpty()){
+
+                findNavController().navigate(R.id.action_createNewFieldFragment_to_homeFragment)
+            }
+
         }
 
         binding.saveButton.setOnClickListener {

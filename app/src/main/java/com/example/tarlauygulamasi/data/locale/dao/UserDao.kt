@@ -9,9 +9,9 @@ import com.example.tarlauygulamasi.data.locale.entity.User
 interface UserDao {
 
     @Insert
-    fun insertUser(user : User)
+    suspend fun insertUser(user : User)
 
     @Query("SELECT * FROM user WHERE id=:userId ")
-    fun getUserById(userId: String):User?
+    suspend fun getUserById(userId: String):User?
 
 }

@@ -15,7 +15,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
+        android:layout_gravity="bottom"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:background="#80000000">
@@ -64,40 +64,42 @@
 
         </LinearLayout>
 
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:background="#80000000">
+
+
+            <Button
+                android:id="@+id/draw_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:backgroundTint="@color/blue"
+                android:text="@string/tarlayı_çiz" />
+            <Button
+                android:id="@+id/undo_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:backgroundTint="@color/blue"
+                android:text="@string/geri_button"/>
+            <Button
+                android:id="@+id/save_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|center_horizontal"
+                android:backgroundTint="@color/blue"
+                android:text="@string/kaydet_button"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:background="#80000000">
-
-
-        <Button
-            android:id="@+id/draw_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:backgroundTint="@color/blue"
-            android:text="@string/tarlayı_çiz" />
-        <Button
-            android:id="@+id/undo_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:backgroundTint="@color/blue"
-            android:text="@string/geri_button"/>
-        <Button
-            android:id="@+id/save_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:backgroundTint="@color/blue"
-            android:text="@string/kaydet_button"/>
-
-    </LinearLayout>
 
 </FrameLayout>

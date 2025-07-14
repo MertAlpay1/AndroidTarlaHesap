@@ -13,11 +13,15 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import com.example.tarlauygulamasi.R
 import com.example.tarlauygulamasi.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+
+
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -25,7 +29,7 @@ class HomeFragment : Fragment() {
     private var _binding : FragmentHomeBinding?=null
     private val binding get()=_binding!!
 
-    private val viewModel: HomeViewModel by activityViewModels()
+    private val viewModel: HomeViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,12 +50,16 @@ class HomeFragment : Fragment() {
 
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
 
+        var username="rıfkı"
 
+        viewLifecycleOwner.lifecycleScope.launch {
+            val user=viewModel.getUsername()
+            username=user!!.username
+            (requireActivity() as AppCompatActivity).supportActionBar?.title = username
+        }
 
-        val username = "rifki"
 
         (requireActivity() as AppCompatActivity).supportActionBar?.title = username
-
 
         binding.newfieldButton.setOnClickListener {
 

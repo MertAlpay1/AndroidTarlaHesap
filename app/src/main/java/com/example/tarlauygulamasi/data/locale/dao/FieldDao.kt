@@ -9,9 +9,9 @@ import com.example.tarlauygulamasi.data.locale.entity.Field
 interface FieldDao {
 
     @Insert
-    fun insertField(field: Field)
+    suspend fun insertField(field: Field)
 
     @Delete
-    fun deleteField(field: Field)
+    suspend fun deleteField(field: Field)
 
 }
