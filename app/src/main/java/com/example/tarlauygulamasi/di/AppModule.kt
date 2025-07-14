@@ -2,9 +2,8 @@ package com.example.tarlauygulamasi.di
 
 import android.content.Context
 import com.example.tarlauygulamasi.data.dao.UserDao
-import com.example.tarlauygulamasi.data.database.UserDatabase
 import com.example.tarlauygulamasi.data.locale.dao.FieldDao
-import com.example.tarlauygulamasi.data.locale.database.FieldDatabase
+import com.example.tarlauygulamasi.data.locale.database.AppDataBase
 import com.example.tarlauygulamasi.data.repository.AuthenticationRepositoryImpl
 import com.example.tarlauygulamasi.data.repository.FieldRepositoryImpl
 import com.example.tarlauygulamasi.data.repository.UserRepositoryImpl
@@ -35,14 +34,10 @@ object AppModule {
         return AuthenticationRepositoryImpl(auth, userRepository)
     }
 
-    @Singleton
-    @Provides
-    fun provideUserDatabase(@ApplicationContext context: Context): UserDatabase {
-        return UserDatabase.getInstance(context)
-    }
+
     @Provides
     @Singleton
-    fun provideUserDao(db: UserDatabase): UserDao= db.userDao()
+    fun provideUserDao(db: AppDataBase): UserDao= db.userDao()
 
     @Provides
     @Singleton
@@ -52,17 +47,17 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideFieldDatabase(@ApplicationContext context: Context): FieldDatabase{
-        return FieldDatabase.getInstance(context)
+    fun provideDatabase(@ApplicationContext context: Context): AppDataBase{
+        return AppDataBase.getInstance(context)
     }
 
     @Singleton
     @Provides
-    fun provideFieldDao(db: FieldDatabase): FieldDao=db.fieldDao()
+    fun provideFieldDao(db: AppDataBase): FieldDao=db.fieldDao()
 
     @Singleton
     @Provides
-    fun provedeFieldRepository(fieldDao: FieldDao): FieldRepository{
+    fun provideFieldRepository(fieldDao: FieldDao): FieldRepository{
         return FieldRepositoryImpl(fieldDao)
     }
 

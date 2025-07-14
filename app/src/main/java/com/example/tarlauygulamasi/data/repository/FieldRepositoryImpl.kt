@@ -10,9 +10,11 @@ class FieldRepositoryImpl(
 ): FieldRepository{
     override suspend fun insertField(field: Field) {
 
+        fieldDao.insertField(field)
     }
 
     override suspend fun deleteField(field: Field) {
+        fieldDao.deleteField(field)
     }
 
 }

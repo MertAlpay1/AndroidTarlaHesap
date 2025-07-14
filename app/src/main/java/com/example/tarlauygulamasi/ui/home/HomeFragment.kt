@@ -50,11 +50,11 @@ class HomeFragment : Fragment() {
 
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
 
-        var username="rıfkı"
+        var username: String? ="rıfkı"
 
         viewLifecycleOwner.lifecycleScope.launch {
             val user=viewModel.getUsername()
-            username=user!!.username
+            username=user?.username
             (requireActivity() as AppCompatActivity).supportActionBar?.title = username
         }
 

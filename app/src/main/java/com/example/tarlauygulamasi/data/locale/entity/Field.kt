@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.google.android.gms.maps.model.LatLng
 import org.checkerframework.checker.units.qual.Area
 
 @Entity(
@@ -16,11 +17,10 @@ import org.checkerframework.checker.units.qual.Area
 data class Field(
 
     @PrimaryKey(autoGenerate = true)
-    val id: Long,
+    val id: Long=0,
     val name:String="",
     val area: Double=0.0,
-    val pointList: ArrayList<String> = arrayListOf(),
-    @ColumnInfo("userId")
+    val pointList: MutableList<LatLng>,
     val userId: String,
 
     )

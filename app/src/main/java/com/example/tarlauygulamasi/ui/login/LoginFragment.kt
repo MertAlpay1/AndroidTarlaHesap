@@ -50,6 +50,7 @@ class LoginFragment : Fragment() {
         binding.password.setText(viewModel.loginPasswordInput.value ?: "")
 
         //direkt giriş için
+
         viewModel.login("mert@gmail.com", "123456")
 
 
