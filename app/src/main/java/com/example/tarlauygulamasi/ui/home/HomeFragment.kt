@@ -22,7 +22,6 @@ import com.example.tarlauygulamasi.data.locale.entity.Field
 import com.example.tarlauygulamasi.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 
@@ -64,7 +63,13 @@ class HomeFragment : Fragment() {
 
         val fieldList:Flow<List<Field>> =viewModel.getUserField()
 
-        val adapter = FieldRecyclerViewAdapter()
+        val adapter = FieldRecyclerViewAdapter(onItemClick = { field ->
+
+            //Haritada göster yeni fragment
+
+        }, onItemLongClick = { field ->
+            deleteFieldConfirmationDialog(field.id)
+        })
         binding.fieldRecyclerView.adapter=adapter
         binding.fieldRecyclerView.layoutManager= LinearLayoutManager(requireContext())
 
@@ -72,9 +77,9 @@ class HomeFragment : Fragment() {
             viewModel.getUserField().collect { fieldList ->
                 adapter.updateFields(fieldList)
 
+
             }
         }
-
 
 
         binding.newfieldButton.setOnClickListener {
@@ -120,6 +125,27 @@ class HomeFragment : Fragment() {
 
         }
 
+        builder.show()
+    }
+
+    private fun deleteFieldConfirmationDialog(fieldId:Long){
+
+        val builder= AlertDialog.Builder(requireContext())
+
+        builder.setTitle("Silme")
+        builder.setMessage("Silmek istediğinize emin misiniz?")
+
+        builder.setPositiveButton("Evet"){dialog, which ->
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.deleteField(fieldId)
+            }
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("Hayır"){dialog, which ->
+
+            dialog.dismiss()
+        }
         builder.show()
     }
 

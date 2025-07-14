@@ -10,24 +10,31 @@ import com.example.tarlauygulamasi.data.locale.entity.Field
 import com.example.tarlauygulamasi.databinding.FieldItemViewBinding
 
 class FieldRecyclerViewAdapter(
-    private var fieldList: List<Field> = emptyList()
+    private var fieldList: List<Field> = emptyList(),
+    private val onItemClick: (Field) -> Unit,
+    private val onItemLongClick: (Field) -> Unit,
 ) : RecyclerView.Adapter<FieldRecyclerViewAdapter.FieldViewHolder>() {
 
     inner class FieldViewHolder(val binding: FieldItemViewBinding)
         : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FieldViewHolder   {
-
         val binding= FieldItemViewBinding.inflate(LayoutInflater.from(parent.context),parent,false)
-
         return FieldViewHolder(binding)
-
     }
 
     override fun onBindViewHolder(holder: FieldViewHolder, position: Int) {
         val item = fieldList[position]
         holder.binding.FieldName.text = item.name
         holder.binding.FieldArea.text = "${item.area} m²"
+
+        holder.itemView.setOnClickListener {
+            onItemClick(item)
+        }
+        holder.itemView.setOnLongClickListener {
+            onItemLongClick(item)
+            true
+        }
     }
 
     override fun getItemCount(): Int {
@@ -37,5 +44,6 @@ class FieldRecyclerViewAdapter(
         fieldList = newList
         notifyDataSetChanged()
     }
+
 
 }

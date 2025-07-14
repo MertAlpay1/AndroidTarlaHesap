@@ -3,6 +3,7 @@ package com.example.tarlauygulamasi.ui.home
 import androidx.lifecycle.ViewModel
 import com.example.tarlauygulamasi.data.locale.entity.Field
 import com.example.tarlauygulamasi.data.locale.entity.User
+import com.example.tarlauygulamasi.domain.usercase.DeleteFieldUseCase
 import com.example.tarlauygulamasi.domain.usercase.GetCurrentUserIdUseCase
 import com.example.tarlauygulamasi.domain.usercase.GetUserFieldUseCase
 import com.example.tarlauygulamasi.domain.usercase.GetUsernameUseCase
@@ -19,8 +20,7 @@ class HomeViewModel @Inject constructor(
     private val getUsernameUseCase: GetUsernameUseCase,
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
     private val getUserFieldUseCase: GetUserFieldUseCase,
-    private val auth:FirebaseAuth
-
+    private val deleteFieldUseCase: DeleteFieldUseCase,
 ) : ViewModel(){
 
      suspend fun getUsername(): User?{
@@ -37,9 +37,9 @@ class HomeViewModel @Inject constructor(
         return  getUserFieldUseCase(id)
     }
 
-
-
-
+    suspend fun deleteField(fieldId:Long){
+        deleteFieldUseCase(fieldId)
+    }
     fun signout(){
         signoutUseCase()
     }

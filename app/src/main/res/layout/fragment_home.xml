@@ -60,10 +60,8 @@
             android:gravity="center"
             android:layout_marginStart="20dp"
             android:padding="10dp"/>
-
-
-
     </LinearLayout>
+
 
 
     <TextView
@@ -75,13 +73,14 @@
         android:textColor="@color/white"
         android:layout_below="@id/topButtons"
         android:gravity="center"
-        android:id="@+id/FieldFlist"
+        android:id="@+id/Fieldlist"
+        android:layout_margin="20dp"
         />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/FieldFlist"
+        android:layout_below="@id/Fieldlist"
         android:id="@+id/fieldRecyclerView"/>
 
 

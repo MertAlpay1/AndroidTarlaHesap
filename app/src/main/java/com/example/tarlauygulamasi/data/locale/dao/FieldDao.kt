@@ -13,8 +13,8 @@ interface FieldDao {
     @Insert
     suspend fun insertField(field: Field)
 
-    @Delete
-    suspend fun deleteField(field: Field)
+    @Query("DELETE  FROM field WHERE field.id=:fieldId")
+    suspend fun deleteFieldBy(fieldId: Long)
 
     @Query("SELECT * FROM field  WHERE userId=:userId")
     fun getFieldByUserId(userId: String): Flow<List<Field>>
