@@ -1,5 +1,6 @@
 package com.example.tarlauygulamasi.data.repository
 
+import android.util.Log
 import com.example.tarlauygulamasi.data.locale.entity.User
 import com.example.tarlauygulamasi.domain.repository.AuthenticationRepository
 import com.example.tarlauygulamasi.domain.repository.UserRepository
@@ -48,6 +49,7 @@ class AuthenticationRepositoryImpl @Inject constructor(
     override fun logout() {
 
         auth.signOut()
+        Log.d("Giriş", "Kullanıcı çıkış yaptı. currentUser: ${auth.currentUser}")
 
     }
 

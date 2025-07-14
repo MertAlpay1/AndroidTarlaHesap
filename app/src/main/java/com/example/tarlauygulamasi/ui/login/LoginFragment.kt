@@ -1,6 +1,7 @@
 package com.example.tarlauygulamasi.ui.login
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,10 +50,17 @@ class LoginFragment : Fragment() {
         binding.eMail.setText(viewModel.loginEmailInput.value ?: "")
         binding.password.setText(viewModel.loginPasswordInput.value ?: "")
 
+
+
+
+        val auth_Check=viewModel.checkAuth()
+        if(auth_Check){
+            Log.d("Giriş","Auth çıkmamış")
+            findNavController().navigate(R.id.action_loginFragment_to_homeFragment)
+        }
+
         //direkt giriş için
-
         viewModel.login("mert@gmail.com", "123456")
-
 
         binding.loginButton.setOnClickListener {
             val emailText = binding.eMail.text.toString().trim()

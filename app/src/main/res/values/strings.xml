@@ -62,4 +62,7 @@
     <string name="donum_alan">Dönüm :</string>
     <string name="default_m">0 m²</string>
     <string name="default_dönüm">0 dönüm</string>
+    <string name="fieldname">FieldName</string>
+    <string name="fieldarea">FieldArea</string>
+    <string name="mevcut_tarlalariniz">Mevcut Tarlalarınız:</string>
 </resources>

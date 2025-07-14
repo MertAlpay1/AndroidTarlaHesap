@@ -9,10 +9,10 @@ class GetCurrentUserIdUseCase @Inject constructor(
 ) {
 
     operator fun invoke():String{
-        val user= auth.currentUser
+        val user=auth.currentUser
 
-        Log.d("kullanıc1",user!!.uid)
-        return user!!.uid
+        Log.d("kullanıc1", user?.uid ?: "Kullnıcı bulunamadı")
+        return user?.uid ?: ""
     }
 
 

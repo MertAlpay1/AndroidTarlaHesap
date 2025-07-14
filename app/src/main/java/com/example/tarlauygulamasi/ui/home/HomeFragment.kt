@@ -16,9 +16,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.tarlauygulamasi.R
+import com.example.tarlauygulamasi.data.locale.entity.Field
 import com.example.tarlauygulamasi.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 
@@ -28,7 +32,6 @@ class HomeFragment : Fragment() {
 
     private var _binding : FragmentHomeBinding?=null
     private val binding get()=_binding!!
-
     private val viewModel: HomeViewModel by viewModels()
 
     override fun onCreateView(
@@ -57,9 +60,22 @@ class HomeFragment : Fragment() {
             username=user?.username
             (requireActivity() as AppCompatActivity).supportActionBar?.title = username
         }
+        //(requireActivity() as AppCompatActivity).supportActionBar?.title = username
+
+        val fieldList:Flow<List<Field>> =viewModel.getUserField()
+
+        val adapter = FieldRecyclerViewAdapter()
+        binding.fieldRecyclerView.adapter=adapter
+        binding.fieldRecyclerView.layoutManager= LinearLayoutManager(requireContext())
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.getUserField().collect { fieldList ->
+                adapter.updateFields(fieldList)
+
+            }
+        }
 
 
-        (requireActivity() as AppCompatActivity).supportActionBar?.title = username
 
         binding.newfieldButton.setOnClickListener {
 
@@ -107,8 +123,6 @@ class HomeFragment : Fragment() {
         builder.show()
     }
 
-
-    //kullanıcı adı en yukarıda
 
     //En son eklenen tarlaları home da göster boş gözükmesin
 

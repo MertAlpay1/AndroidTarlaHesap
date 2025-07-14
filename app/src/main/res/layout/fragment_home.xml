@@ -29,6 +29,7 @@
 
 
     <LinearLayout
+        android:id="@+id/topButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/toptoolbar"
@@ -63,6 +64,25 @@
 
 
     </LinearLayout>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/mevcut_tarlalariniz"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:layout_below="@id/topButtons"
+        android:gravity="center"
+        android:id="@+id/FieldFlist"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/FieldFlist"
+        android:id="@+id/fieldRecyclerView"/>
 
 
 
