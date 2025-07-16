@@ -46,11 +46,8 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         binding.eMail.setText(viewModel.loginEmailInput.value ?: "")
         binding.password.setText(viewModel.loginPasswordInput.value ?: "")
-
-
 
 
         val auth_Check=viewModel.checkAuth()

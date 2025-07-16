@@ -31,7 +31,7 @@ class HomeFragment : Fragment() {
 
     private var _binding : FragmentHomeBinding?=null
     private val binding get()=_binding!!
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,8 +58,8 @@ class HomeFragment : Fragment() {
             val user=viewModel.getUsername()
             username=user?.username
             (requireActivity() as AppCompatActivity).supportActionBar?.title = username
+
         }
-        //(requireActivity() as AppCompatActivity).supportActionBar?.title = username
 
         val fieldList:Flow<List<Field>> =viewModel.getUserField()
 
@@ -70,6 +70,7 @@ class HomeFragment : Fragment() {
         }, onItemLongClick = { field ->
             deleteFieldConfirmationDialog(field.id)
         })
+
         binding.fieldRecyclerView.adapter=adapter
         binding.fieldRecyclerView.layoutManager= LinearLayoutManager(requireContext())
 
@@ -132,7 +133,7 @@ class HomeFragment : Fragment() {
 
         val builder= AlertDialog.Builder(requireContext())
 
-        builder.setTitle("Silme")
+        builder.setTitle("Tarla Silme")
         builder.setMessage("Silmek istediğinize emin misiniz?")
 
         builder.setPositiveButton("Evet"){dialog, which ->
@@ -148,8 +149,5 @@ class HomeFragment : Fragment() {
         }
         builder.show()
     }
-
-
-    //En son eklenen tarlaları home da göster boş gözükmesin
 
 }

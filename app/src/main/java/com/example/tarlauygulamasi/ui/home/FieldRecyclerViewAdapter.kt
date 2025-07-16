@@ -8,6 +8,7 @@ import androidx.lifecycle.model.AdapterClass
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tarlauygulamasi.data.locale.entity.Field
 import com.example.tarlauygulamasi.databinding.FieldItemViewBinding
+import com.example.tarlauygulamasi.util.toFormattedArea
 
 class FieldRecyclerViewAdapter(
     private var fieldList: List<Field> = emptyList(),
@@ -26,7 +27,7 @@ class FieldRecyclerViewAdapter(
     override fun onBindViewHolder(holder: FieldViewHolder, position: Int) {
         val item = fieldList[position]
         holder.binding.FieldName.text = item.name
-        holder.binding.FieldArea.text = "${item.area} m²"
+        holder.binding.FieldArea.text = item.area.toFormattedArea()
 
         holder.itemView.setOnClickListener {
             onItemClick(item)
