@@ -11,7 +11,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import android.widget.SearchView
+
 import androidx.fragment.app.activityViewModels
+
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -80,9 +83,19 @@ class HomeFragment : Fragment() {
             viewModel.getUserField().collect { fieldList ->
                 adapter.updateFields(fieldList)
 
-
             }
         }
+
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                adapter.filter?.filter(newText)
+                return true
+            }
+        })
 
 
         binding.newfieldButton.setOnClickListener {

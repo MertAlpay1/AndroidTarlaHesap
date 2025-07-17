@@ -77,10 +77,21 @@
         android:layout_margin="20dp"
         />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <SearchView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/Fieldlist"
+        android:layout_below="@+id/Fieldlist"
+        android:id="@+id/searchView"
+        android:queryHint="Tarla ara..."
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/rounded_login_background" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/searchView"
         android:id="@+id/fieldRecyclerView"/>
 
 

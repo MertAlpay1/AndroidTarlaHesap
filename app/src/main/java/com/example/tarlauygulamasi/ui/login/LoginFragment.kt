@@ -57,7 +57,7 @@ class LoginFragment : Fragment() {
         }
 
         //direkt giriş için
-        viewModel.login("mert@gmail.com", "123456")
+        //viewModel.login("mert@gmail.com", "123456")
 
         binding.loginButton.setOnClickListener {
             val emailText = binding.eMail.text.toString().trim()
