@@ -11,4 +11,8 @@ interface FieldRepository {
 
     fun getFieldByUserId(userId: String): Flow<List<Field>>
 
+    suspend fun getFieldByFieldID(fieldId:Long): Field
+
+    suspend fun updateField(field: Field)
+
 }

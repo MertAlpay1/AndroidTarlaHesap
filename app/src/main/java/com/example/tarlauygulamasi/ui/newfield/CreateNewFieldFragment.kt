@@ -104,9 +104,14 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
                 when(val action=undoStack.pop()){
                     is FieldEditStack.AddPoint ->{
 
-                        latLngList.remove(action.point)
-                        action.marker?.remove()
-                        markerList.remove(action.marker)
+                        if (latLngList.isNotEmpty() && markerList.isNotEmpty()) {
+                            val lastIndex = latLngList.size - 1
+
+                            val removedMarker = markerList.removeAt(lastIndex)
+                            removedMarker?.remove()
+
+                            latLngList.removeAt(lastIndex)
+                        }
 
                     }
                     is FieldEditStack.MovePoint ->{
@@ -127,25 +132,6 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
 
             }
 
-            /*
-            if(markerList.isEmpty()){
-                findNavController().navigate(R.id.action_createNewFieldFragment_to_homeFragment)
-            }
-
-            if (markerList.isNotEmpty()) {
-                val removedMarker = markerList.removeAt(markerList.size - 1)
-                removedMarker?.remove()
-            }
-            if (LatLngList.isNotEmpty()) {
-                LatLngList.removeAt(LatLngList.size - 1)
-            }
-
-            if(LatLngList.size<=2) isDrawn=false
-
-            if(isDrawn) draw()
-
-             */
-
         }
 
         binding.saveButton.setOnClickListener {
@@ -159,7 +145,6 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
                         Toast.LENGTH_SHORT).show()
                 }else {
                     val input = saveConfirmationDialog()
-
 
                     if (input.isEmpty()) {
                         Toast.makeText(requireContext(),"Lütfen tarlanızı isimlendirin",
@@ -208,7 +193,7 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
             lateinit var newLatLng : LatLng
 
             override fun onMarkerDragStart(marker: Marker) {
-                oldLatLng=marker.position
+                //oldLatLng=marker.position
             }
 
             override fun onMarkerDrag(marker: Marker) {
@@ -218,14 +203,17 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
             override fun onMarkerDragEnd(marker: Marker) {
 
                 newLatLng=marker.position
-                val index = markerList.indexOf(marker)
-                if(index!=-1 && newLatLng!=null) {
+                val indexa:Int = markerList.indexOf(marker)
+                if(indexa!=-1 && newLatLng!=null) {
 
-                    latLngList[index]= newLatLng
+                    oldLatLng=latLngList[indexa]
+                    latLngList[indexa]= newLatLng
+
+                    undoStack.push(FieldEditStack.MovePoint(oldLatLng,newLatLng,indexa))
 
                     if(isDrawn) draw()
 
-                    undoStack.push(FieldEditStack.MovePoint(oldLatLng,newLatLng,index))
+
 
                 }
 

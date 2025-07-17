@@ -43,6 +43,9 @@
         <action
             android:id="@+id/action_homeFragment_to_createNewFieldFragment"
             app:destination="@id/createNewFieldFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_fieldDetailFragment"
+            app:destination="@id/fieldDetailFragment" />
     </fragment>
     <fragment
         android:id="@+id/createNewFieldFragment"
@@ -52,5 +55,17 @@
         <action
             android:id="@+id/action_createNewFieldFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/fieldDetailFragment"
+        android:name="com.example.tarlauygulamasi.ui.field_detail.FieldDetailFragment"
+        android:label="fragment_field_detail"
+        tools:layout="@layout/fragment_field_detail" >
+        <action
+            android:id="@+id/action_fieldDetailFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+        <argument
+            android:name="fieldId"
+            app:argType="long" />
     </fragment>
 </navigation>

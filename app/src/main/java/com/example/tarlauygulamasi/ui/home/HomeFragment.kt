@@ -65,8 +65,10 @@ class HomeFragment : Fragment() {
 
         val adapter = FieldRecyclerViewAdapter(onItemClick = { field ->
 
-            //Haritada göster yeni fragment
-
+            findNavController().navigate(R.id.action_homeFragment_to_fieldDetailFragment, Bundle().apply {
+                putLong("fieldId",field.id)
+            })
+            
         }, onItemLongClick = { field ->
             deleteFieldConfirmationDialog(field.id)
         })

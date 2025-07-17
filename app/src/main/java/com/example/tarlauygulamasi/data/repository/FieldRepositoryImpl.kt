@@ -22,5 +22,13 @@ class FieldRepositoryImpl(
         return fieldDao.getFieldByUserId(userId)
     }
 
+    override suspend fun getFieldByFieldID(fieldId: Long): Field {
+        return fieldDao.getFieldByFieldId(fieldId)
+    }
+
+    override suspend fun updateField(field: Field) {
+        fieldDao.updateField(field)
+    }
+
 
 }
