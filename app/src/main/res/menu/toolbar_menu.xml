@@ -7,12 +7,7 @@
         android:title="Çıkış"
         android:icon="@drawable/exit_icon"
         app:showAsAction="always" />
-    <item
-        android:id="@+id/action_search"
-        android:title="Search"
-        android:icon="@drawable/search_icon"
-        app:showAsAction="always"
-        />
+
 
 
 

@@ -11,7 +11,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import android.widget.SearchView
+
 import androidx.fragment.app.activityViewModels
+
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -22,7 +25,6 @@ import com.example.tarlauygulamasi.data.locale.entity.Field
 import com.example.tarlauygulamasi.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 
 
@@ -32,7 +34,7 @@ class HomeFragment : Fragment() {
 
     private var _binding : FragmentHomeBinding?=null
     private val binding get()=_binding!!
-    private val viewModel: HomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,12 +61,21 @@ class HomeFragment : Fragment() {
             val user=viewModel.getUsername()
             username=user?.username
             (requireActivity() as AppCompatActivity).supportActionBar?.title = username
+
         }
-        //(requireActivity() as AppCompatActivity).supportActionBar?.title = username
 
         val fieldList:Flow<List<Field>> =viewModel.getUserField()
 
-        val adapter = FieldRecyclerViewAdapter()
+        val adapter = FieldRecyclerViewAdapter(onItemClick = { field ->
+
+            findNavController().navigate(R.id.action_homeFragment_to_fieldDetailFragment, Bundle().apply {
+                putLong("fieldId",field.id)
+            })
+            
+        }, onItemLongClick = { field ->
+            deleteFieldConfirmationDialog(field.id)
+        })
+
         binding.fieldRecyclerView.adapter=adapter
         binding.fieldRecyclerView.layoutManager= LinearLayoutManager(requireContext())
 
@@ -75,6 +86,16 @@ class HomeFragment : Fragment() {
             }
         }
 
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                adapter.filter?.filter(newText)
+                return true
+            }
+        })
 
 
         binding.newfieldButton.setOnClickListener {
@@ -123,7 +144,25 @@ class HomeFragment : Fragment() {
         builder.show()
     }
 
+    private fun deleteFieldConfirmationDialog(fieldId:Long){
 
-    //En son eklenen tarlaları home da göster boş gözükmesin
+        val builder= AlertDialog.Builder(requireContext())
+
+        builder.setTitle("Tarla Silme")
+        builder.setMessage("Silmek istediğinize emin misiniz?")
+
+        builder.setPositiveButton("Evet"){dialog, which ->
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.deleteField(fieldId)
+            }
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("Hayır"){dialog, which ->
+
+            dialog.dismiss()
+        }
+        builder.show()
+    }
 
 }

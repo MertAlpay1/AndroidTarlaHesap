@@ -7,8 +7,12 @@ interface FieldRepository {
 
     suspend fun insertField(field: Field)
 
-    suspend fun deleteField(field: Field)
+    suspend fun deleteField(fieldId:Long)
 
     fun getFieldByUserId(userId: String): Flow<List<Field>>
+
+    suspend fun getFieldByFieldID(fieldId:Long): Field
+
+    suspend fun updateField(field: Field)
 
 }

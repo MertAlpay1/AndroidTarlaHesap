@@ -25,6 +25,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.tarlauygulamasi.R
 import com.example.tarlauygulamasi.data.locale.entity.Field
 import com.example.tarlauygulamasi.databinding.FragmentCreateNewFieldBinding
+import com.example.tarlauygulamasi.util.FieldEditStack
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -40,6 +41,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.checkerframework.checker.units.qual.Area
+import java.util.Stack
 import kotlin.coroutines.resume
 import kotlin.math.log
 
@@ -52,8 +54,10 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
 
     private lateinit var mapView: MapView
     private lateinit var googleMap: GoogleMap
-    private lateinit var LatLngList: MutableList<LatLng>
+    private lateinit var latLngList: MutableList<LatLng>
     private lateinit var  markerList: MutableList<Marker?>
+
+    private var undoStack= Stack<FieldEditStack>()
     private  var  polygon: Polygon? = null
     private var isDrawn=false
     private  var area: Double=0.0
@@ -70,7 +74,7 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View {
 
-        LatLngList = mutableListOf()
+        latLngList = mutableListOf()
         markerList = mutableListOf()
 
 
@@ -81,7 +85,6 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
         binding.map.getMapAsync(this)
 
         val view=binding.root
-
 
         return view
     }
@@ -96,21 +99,37 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
         }
         binding.undoButton.setOnClickListener {
 
-            if (markerList.isNotEmpty()) {
-                val removedMarker = markerList.removeAt(markerList.size - 1)
-                removedMarker?.remove()
-            }
-            if (LatLngList.isNotEmpty()) {
-                LatLngList.removeAt(LatLngList.size - 1)
-            }
+            if(undoStack.isNotEmpty()){
 
-            if(LatLngList.size<1) isDrawn=false
+                when(val action=undoStack.pop()){
+                    is FieldEditStack.AddPoint ->{
 
-            if(isDrawn) draw()
+                        if (latLngList.isNotEmpty() && markerList.isNotEmpty()) {
+                            val lastIndex = latLngList.size - 1
 
-            if(markerList.isEmpty()){
+                            val removedMarker = markerList.removeAt(lastIndex)
+                            removedMarker?.remove()
+
+                            latLngList.removeAt(lastIndex)
+                        }
+
+                    }
+                    is FieldEditStack.MovePoint ->{
+
+                        markerList[action.index]?.position =action.oldPoint
+                        latLngList[action.index]=action.oldPoint
+
+                    }
+                }
+                if(latLngList.size<1) isDrawn=false
+
+                if(isDrawn) draw()
+
+
+            }else{
 
                 findNavController().navigate(R.id.action_createNewFieldFragment_to_homeFragment)
+
             }
 
         }
@@ -127,19 +146,22 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
                 }else {
                     val input = saveConfirmationDialog()
 
-                    /*
                     if (input.isEmpty()) {
                         Toast.makeText(requireContext(),"Lütfen tarlanızı isimlendirin",
                             Toast.LENGTH_SHORT).show()
                     }
                     else {
-                        viewModel.insertField(input, area, LatLngList)
+                        viewModel.insertField(input, area, latLngList)
+                        Toast.makeText(requireContext(),"Tarlanız başarıyla kaydedildi.",
+                            Toast.LENGTH_SHORT).show()
+
+                        findNavController().navigate(R.id.action_createNewFieldFragment_to_homeFragment)
+
                     }
 
-                     */
-                    viewModel.insertField(input, area, LatLngList)
+                    //viewModel.insertField(input, area, LatLngList)
                 }
-                //Yönlendirme yap
+
             }
 
 
@@ -159,16 +181,19 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
 
             val marker =googleMap.addMarker(markerOptions)
 
-            LatLngList.add(latLng)
+            latLngList.add(latLng)
             markerList.add(marker)
+
+            undoStack.push(FieldEditStack.AddPoint(latLng,marker))
+
         }
 
         googleMap.setOnMarkerDragListener(object : GoogleMap.OnMarkerDragListener {
-            var oldLatLng : LatLng?=null
-            var newLatLng : LatLng?=null
+            lateinit var oldLatLng : LatLng
+            lateinit var newLatLng : LatLng
 
             override fun onMarkerDragStart(marker: Marker) {
-                oldLatLng=marker.position
+                //oldLatLng=marker.position
             }
 
             override fun onMarkerDrag(marker: Marker) {
@@ -178,12 +203,18 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
             override fun onMarkerDragEnd(marker: Marker) {
 
                 newLatLng=marker.position
-                val index = markerList.indexOf(marker)
-                if(index!=-1 && newLatLng!=null) {
+                val indexa:Int = markerList.indexOf(marker)
+                if(indexa!=-1 && newLatLng!=null) {
 
-                    LatLngList[index]= newLatLng!!
+                    oldLatLng=latLngList[indexa]
+                    latLngList[indexa]= newLatLng
+
+                    undoStack.push(FieldEditStack.MovePoint(oldLatLng,newLatLng,indexa))
 
                     if(isDrawn) draw()
+
+
+
                 }
 
             }
@@ -196,13 +227,13 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
     fun draw(){
         polygon?.remove()
 
-        val polygonOptions=PolygonOptions().addAll(LatLngList).clickable(true)
+        val polygonOptions=PolygonOptions().addAll(latLngList).clickable(true)
         polygon=googleMap.addPolygon(polygonOptions)
 
         //Saydam mavi
         polygon?.fillColor = Color.argb(88, 0, 0, 255)
 
-         area= SphericalUtil.computeArea(LatLngList)
+         area= SphericalUtil.computeArea(latLngList)
         val donumArea=area/1000
 
         binding.area.text = String.format("%.2f m²", area)

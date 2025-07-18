@@ -14,12 +14,20 @@ class FieldRepositoryImpl(
         fieldDao.insertField(field)
     }
 
-    override suspend fun deleteField(field: Field) {
-        fieldDao.deleteField(field)
+    override suspend fun deleteField(fieldId:Long) {
+        fieldDao.deleteFieldBy(fieldId)
     }
 
     override  fun getFieldByUserId(userId: String): Flow<List<Field>> {
         return fieldDao.getFieldByUserId(userId)
+    }
+
+    override suspend fun getFieldByFieldID(fieldId: Long): Field {
+        return fieldDao.getFieldByFieldId(fieldId)
+    }
+
+    override suspend fun updateField(field: Field) {
+        fieldDao.updateField(field)
     }
 
 

@@ -19,8 +19,8 @@ data class Field(
     @PrimaryKey(autoGenerate = true)
     val id: Long=0,
     val name:String="",
-    val area: Double=0.0,
-    val pointList: MutableList<LatLng>,
+    var area: Double=0.0,
+    var pointList: MutableList<LatLng>,
     val userId: String,
 
     )
