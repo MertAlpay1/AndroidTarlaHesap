@@ -2,24 +2,15 @@ package com.example.tarlauygulamasi.ui.newfield
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.app.Dialog
-import android.content.Context
-import android.content.DialogInterface
 import android.graphics.Color
-import android.location.GnssAntennaInfo
 import androidx.fragment.app.viewModels
 import android.os.Bundle
-import android.provider.CalendarContract
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
-import androidx.core.graphics.toColor
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.tarlauygulamasi.R
@@ -35,17 +26,14 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.maps.android.SphericalUtil
-import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import org.checkerframework.checker.units.qual.Area
 import java.util.Stack
 import kotlin.coroutines.resume
-import kotlin.math.log
 
-//Başlangıçta kullanıcının konumu focus olarak başlatılabilir
 @AndroidEntryPoint
 class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
 
@@ -56,6 +44,7 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
     private lateinit var googleMap: GoogleMap
     private lateinit var latLngList: MutableList<LatLng>
     private lateinit var  markerList: MutableList<Marker?>
+    private lateinit var allFields: Flow<List<Field>>
 
     private var undoStack= Stack<FieldEditStack>()
     private  var  polygon: Polygon? = null
@@ -92,6 +81,16 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+
+        viewLifecycleOwner.lifecycleScope.launch {
+
+            allFields=viewModel.getAllField()
+            drawAllFields()
+
+        }
+
+
 
         binding.drawButton.setOnClickListener {
             isDrawn=true
@@ -136,33 +135,119 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
 
         binding.saveButton.setOnClickListener {
 
+
             //Veri tabanına kaydet
             viewLifecycleOwner.lifecycleScope.launch {
 
-                //val field= Field()
-                if(!isDrawn){
-                    Toast.makeText(requireContext(),"Lütfen haritadan tarlanızı oluşturun",
-                        Toast.LENGTH_SHORT).show()
-                }else {
-                    val input = saveConfirmationDialog()
+                if (check()) {
 
-                    if (input.isEmpty()) {
-                        Toast.makeText(requireContext(),"Lütfen tarlanızı isimlendirin",
-                            Toast.LENGTH_SHORT).show()
+                    //val field= Field()
+                    if (!isDrawn) {
+                        Toast.makeText(
+                            requireContext(), "Lütfen haritadan tarlanızı oluşturun",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        val input = saveConfirmationDialog()
+
+                        if (input.isEmpty()) {
+                            Toast.makeText(
+                                requireContext(), "Lütfen tarlanızı isimlendirin",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            viewModel.insertField(input, area, latLngList)
+                            Toast.makeText(
+                                requireContext(), "Tarlanız başarıyla kaydedildi.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+
+                            findNavController().navigate(R.id.action_createNewFieldFragment_to_homeFragment)
+
+                        }
+
                     }
-                    else {
-                        viewModel.insertField(input, area, latLngList)
-                        Toast.makeText(requireContext(),"Tarlanız başarıyla kaydedildi.",
-                            Toast.LENGTH_SHORT).show()
 
-                        findNavController().navigate(R.id.action_createNewFieldFragment_to_homeFragment)
-
-                    }
-
-                    //viewModel.insertField(input, area, LatLngList)
                 }
+                else{
 
+                    Toast.makeText(requireContext(), "Tarlanız Başka bir tarla ile kesiştiğinden kaydedilemedi.", Toast.LENGTH_SHORT).show()
+
+                }
             }
+
+        }
+
+    }
+
+    fun ccw(A: LatLng, B:LatLng, C:LatLng):Boolean{
+
+        return (C.latitude-A.latitude)*(B.longitude-A.longitude) > (B.latitude-A.latitude)*(C.longitude-A.longitude)
+    }
+    fun intersect(A: LatLng, B:LatLng, C:LatLng,D: LatLng):Boolean{
+        return ccw(A,C,D)!=ccw(B,C,D) && ccw(A,B,C)!=ccw(A,B,D)
+    }
+
+    suspend fun check(): Boolean{
+
+        val listAF: List<Field> = allFields.first()
+
+
+        for(x in latLngList.indices){
+
+                val a1 = latLngList[x]
+                val a2 = latLngList[(x + 1) % latLngList.size]
+
+            for(y in listAF.indices){
+
+                val aFLatLng=listAF.get(y)
+                val aFPointList=aFLatLng.pointList
+
+                for(z in aFPointList.indices){
+
+                         val b1 = aFPointList[z]
+                         val b2 = aFPointList[(z + 1) % aFPointList.size]
+
+                    if(intersect(a1,a2,b1,b2)){
+                        return false
+                    }
+
+                }
+            }
+
+        }
+        return true
+    }
+    fun draw(){
+        polygon?.remove()
+
+        val polygonOptions=PolygonOptions().addAll(latLngList).clickable(true)
+        polygon=googleMap.addPolygon(polygonOptions)
+
+        //Saydam mavi
+        polygon?.fillColor = Color.argb(88, 0, 0, 255)
+
+        area= SphericalUtil.computeArea(latLngList)
+        val donumArea=area/1000
+
+        binding.area.text = String.format("%.2f m²", area)
+        binding.areaDonum.text = String.format("%.2f dönüm", donumArea)
+    }
+
+     suspend fun drawAllFields(){
+
+
+        val listAF: List<Field> = allFields.first()
+
+        listAF.forEach {
+
+            val polygonOptions=PolygonOptions().addAll(it.pointList).clickable(true)
+            //locale polygon
+            var polygon=googleMap.addPolygon(polygonOptions)
+
+            //Saydam kirmiz
+            polygon?.fillColor = Color.argb(88, 255, 0, 0)
+
 
 
         }
@@ -224,21 +309,7 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
 
      }
 
-    fun draw(){
-        polygon?.remove()
 
-        val polygonOptions=PolygonOptions().addAll(latLngList).clickable(true)
-        polygon=googleMap.addPolygon(polygonOptions)
-
-        //Saydam mavi
-        polygon?.fillColor = Color.argb(88, 0, 0, 255)
-
-         area= SphericalUtil.computeArea(latLngList)
-        val donumArea=area/1000
-
-        binding.area.text = String.format("%.2f m²", area)
-        binding.areaDonum.text = String.format("%.2f dönüm", donumArea)
-    }
 
     suspend fun saveConfirmationDialog(): String = suspendCancellableCoroutine{ cont ->
 

@@ -30,5 +30,9 @@ class FieldRepositoryImpl(
         fieldDao.updateField(field)
     }
 
+    override fun getAllField(): Flow<List<Field>> {
+        return fieldDao.getAllField()
+    }
+
 
 }

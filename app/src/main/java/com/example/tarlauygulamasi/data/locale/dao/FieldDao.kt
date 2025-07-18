@@ -26,4 +26,7 @@ interface FieldDao {
     @Query("SELECT * FROM field WHERE field.id=:fieldId")
     suspend fun getFieldByFieldId(fieldId:Long): Field
 
+    @Query("SELECT * FROM field")
+     fun  getAllField(): Flow<List<Field>>
+
 }
