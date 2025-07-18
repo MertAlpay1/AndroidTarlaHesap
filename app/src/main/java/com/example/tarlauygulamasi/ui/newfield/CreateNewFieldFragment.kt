@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
+import com.google.maps.android.PolyUtil
 import com.google.maps.android.SphericalUtil
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
@@ -48,6 +49,7 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
 
     private var undoStack= Stack<FieldEditStack>()
     private  var  polygon: Polygon? = null
+    private lateinit var polygonList:ArrayList<Polygon>
     private var isDrawn=false
     private  var area: Double=0.0
 
@@ -65,6 +67,7 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
 
         latLngList = mutableListOf()
         markerList = mutableListOf()
+        polygonList= arrayListOf()
 
 
         _binding = FragmentCreateNewFieldBinding.inflate(inflater, container, false)
@@ -139,6 +142,8 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
             //Veri tabanına kaydet
             viewLifecycleOwner.lifecycleScope.launch {
 
+                if(!(latLngList.size<3)){
+
                 if (check()) {
 
                     //val field= Field()
@@ -169,91 +174,19 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
                     }
 
                 }
-                else{
-
-                    Toast.makeText(requireContext(), "Tarlanız Başka bir tarla ile kesiştiğinden kaydedilemedi.", Toast.LENGTH_SHORT).show()
-
-                }
-            }
-
-        }
-
-    }
-
-    fun ccw(A: LatLng, B:LatLng, C:LatLng):Boolean{
-
-        return (C.latitude-A.latitude)*(B.longitude-A.longitude) > (B.latitude-A.latitude)*(C.longitude-A.longitude)
-    }
-    fun intersect(A: LatLng, B:LatLng, C:LatLng,D: LatLng):Boolean{
-        return ccw(A,C,D)!=ccw(B,C,D) && ccw(A,B,C)!=ccw(A,B,D)
-    }
-
-    suspend fun check(): Boolean{
-
-        val listAF: List<Field> = allFields.first()
-
-
-        for(x in latLngList.indices){
-
-                val a1 = latLngList[x]
-                val a2 = latLngList[(x + 1) % latLngList.size]
-
-            for(y in listAF.indices){
-
-                val aFLatLng=listAF.get(y)
-                val aFPointList=aFLatLng.pointList
-
-                for(z in aFPointList.indices){
-
-                         val b1 = aFPointList[z]
-                         val b2 = aFPointList[(z + 1) % aFPointList.size]
-
-                    if(intersect(a1,a2,b1,b2)){
-                        return false
-                    }
+                }else{
+                    Toast.makeText(
+                        requireContext(), "Lütfen 3 veya daha fazla nokta belirleyin.",
+                        Toast.LENGTH_SHORT
+                    ).show()
 
                 }
             }
 
         }
-        return true
-    }
-    fun draw(){
-        polygon?.remove()
-
-        val polygonOptions=PolygonOptions().addAll(latLngList).clickable(true)
-        polygon=googleMap.addPolygon(polygonOptions)
-
-        //Saydam mavi
-        polygon?.fillColor = Color.argb(88, 0, 0, 255)
-
-        area= SphericalUtil.computeArea(latLngList)
-        val donumArea=area/1000
-
-        binding.area.text = String.format("%.2f m²", area)
-        binding.areaDonum.text = String.format("%.2f dönüm", donumArea)
-    }
-
-     suspend fun drawAllFields(){
-
-
-        val listAF: List<Field> = allFields.first()
-
-        listAF.forEach {
-
-            val polygonOptions=PolygonOptions().addAll(it.pointList).clickable(true)
-            //locale polygon
-            var polygon=googleMap.addPolygon(polygonOptions)
-
-            //Saydam kirmiz
-            polygon?.fillColor = Color.argb(88, 255, 0, 0)
-
-
-
-        }
-
 
     }
+
 
 
     @SuppressLint("PotentialBehaviorOverride")
@@ -299,16 +232,101 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
                     if(isDrawn) draw()
 
 
+                }
+            }
 
+        })
+     }
+
+
+    fun draw(){
+        polygon?.remove()
+
+        val polygonOptions=PolygonOptions().addAll(latLngList).clickable(true)
+        polygon=googleMap.addPolygon(polygonOptions)
+
+        //Saydam mavi
+        polygon?.fillColor = Color.argb(88, 0, 0, 255)
+
+        area= SphericalUtil.computeArea(latLngList)
+        val donumArea=area/1000
+
+        binding.area.text = String.format("%.2f m²", area)
+        binding.areaDonum.text = String.format("%.2f dönüm", donumArea)
+    }
+
+    suspend fun drawAllFields(){
+
+        val listAF: List<Field> = allFields.first()
+
+        listAF.forEach {
+
+            val polygonOptions=PolygonOptions().addAll(it.pointList).clickable(true)
+            //locale polygon
+            var polygon=googleMap.addPolygon(polygonOptions)
+
+            polygonList.add(polygon)
+
+            //Saydam kirmiz
+            polygon?.fillColor = Color.argb(88, 255, 0, 0)
+
+        }
+
+    }
+
+    fun ccw(A: LatLng, B:LatLng, C:LatLng):Boolean{
+        return (C.latitude-A.latitude)*(B.longitude-A.longitude) > (B.latitude-A.latitude)*(C.longitude-A.longitude)
+    }
+    fun intersect(A: LatLng, B:LatLng, C:LatLng,D: LatLng):Boolean{
+        return ccw(A,C,D)!=ccw(B,C,D) && ccw(A,B,C)!=ccw(A,B,D)
+    }
+
+    suspend fun check(): Boolean{
+
+        for (polygons in polygonList){
+
+            var pointsInPolgon :List<LatLng> = polygons.points
+
+            for (point in pointsInPolgon){
+
+                if(PolyUtil.containsLocation(point, polygon?.points,true)){
+
+                    Toast.makeText(requireContext(), "Tarlanız başka bir tarlayı içine alamaz.", Toast.LENGTH_SHORT).show()
+
+                    return false
                 }
 
             }
 
+        }
 
-        })
+        //Kesişim var mı
+        val listAF: List<Field> = allFields.first()
 
-     }
+        for(x in latLngList.indices){
 
+            val a1 = latLngList[x]
+            val a2 = latLngList[(x + 1) % latLngList.size]
+
+            for(y in listAF.indices){
+
+                val aFLatLng=listAF.get(y)
+                val aFPointList=aFLatLng.pointList
+
+                for(z in aFPointList.indices){
+
+                    val b1 = aFPointList[z]
+                    val b2 = aFPointList[(z + 1) % aFPointList.size]
+
+                    if(intersect(a1,a2,b1,b2)){
+                        Toast.makeText(requireContext(), "Tarlanız başka bir tarla ile kesiştiğinden kaydedilemedi.", Toast.LENGTH_SHORT).show()
+                        return false
+                    }
+                }
+            }
+        }
+        return true
+    }
 
 
     suspend fun saveConfirmationDialog(): String = suspendCancellableCoroutine{ cont ->
