@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.SearchView
+import android.widget.Toast
 
 import androidx.fragment.app.activityViewModels
 
@@ -131,9 +132,12 @@ class HomeFragment : Fragment() {
         builder.setPositiveButton("Evet"){dialog, which ->
 
             viewModel.signout()
-            findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
             dialog.dismiss()
 
+            Toast.makeText(requireContext(),"Çıkış başarılı.",
+                Toast.LENGTH_SHORT).show()
+
+            findNavController().navigate(R.id.action_homeFragment_to_loginFragment)
         }
 
         builder.setNegativeButton("Hayır"){dialog, which ->
@@ -156,6 +160,8 @@ class HomeFragment : Fragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.deleteField(fieldId)
             }
+            Toast.makeText(requireContext(),"Tarlanız başarıyla silindi.",
+                Toast.LENGTH_SHORT).show()
             dialog.dismiss()
         }
         builder.setNegativeButton("Hayır"){dialog, which ->

@@ -15,4 +15,6 @@ interface FieldRepository {
 
     suspend fun updateField(field: Field)
 
+    fun getAllField(): Flow<List<Field>>
+
 }
