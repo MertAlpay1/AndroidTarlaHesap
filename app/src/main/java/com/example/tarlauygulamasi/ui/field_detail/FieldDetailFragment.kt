@@ -187,7 +187,7 @@ class FieldDetailFragment : Fragment(), OnMapReadyCallback {
         polygon=googleMap.addPolygon(polygonOptions)
 
         //Saydam mavi
-        polygon?.fillColor = Color.argb(88, 0, 0, 255)
+        polygon?.fillColor = Color.argb(88, 0, 255, 0)
 
         area= SphericalUtil.computeArea(latLngList)
 
