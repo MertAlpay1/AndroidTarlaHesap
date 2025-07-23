@@ -46,6 +46,9 @@
         <action
             android:id="@+id/action_homeFragment_to_fieldDetailFragment"
             app:destination="@id/fieldDetailFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_createNewFieldByWalkingFragment"
+            app:destination="@id/createNewFieldByWalkingFragment" />
     </fragment>
     <fragment
         android:id="@+id/createNewFieldFragment"
@@ -67,5 +70,14 @@
         <argument
             android:name="fieldId"
             app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/createNewFieldByWalkingFragment"
+        android:name="com.example.tarlauygulamasi.ui.newfield2.CreateNewFieldByWalkingFragment"
+        android:label="fragment_create_new_field_by_walking"
+        tools:layout="@layout/fragment_create_new_field_by_walking" >
+        <action
+            android:id="@+id/action_createNewFieldByWalkingFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
     </fragment>
 </navigation>

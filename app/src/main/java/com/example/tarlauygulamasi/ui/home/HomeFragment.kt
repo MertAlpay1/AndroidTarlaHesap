@@ -104,6 +104,12 @@ class HomeFragment : Fragment() {
             findNavController().navigate(R.id.action_homeFragment_to_createNewFieldFragment)
 
         }
+        binding.newfieldButtonByWalking.setOnClickListener {
+
+            findNavController().navigate(R.id.action_homeFragment_to_createNewFieldByWalkingFragment)
+
+        }
+
 
     }
 

@@ -8,7 +8,8 @@
     android:gravity="center"
     android:padding="16dp"
     android:background="@drawable/login_background"
-    tools:context=".ui.login.LoginFragment">
+    tools:context=".ui.login.LoginFragment"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:id="@+id/LoginLayout"

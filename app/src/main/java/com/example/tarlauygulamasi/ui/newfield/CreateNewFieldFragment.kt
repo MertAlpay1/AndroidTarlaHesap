@@ -2,6 +2,7 @@ package com.example.tarlauygulamasi.ui.newfield
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
+import android.content.pm.PackageManager
 import android.graphics.Color
 import androidx.fragment.app.viewModels
 import android.os.Bundle
@@ -11,15 +12,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.tarlauygulamasi.R
 import com.example.tarlauygulamasi.data.locale.entity.Field
 import com.example.tarlauygulamasi.databinding.FragmentCreateNewFieldBinding
 import com.example.tarlauygulamasi.util.FieldEditStack
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -33,7 +39,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.Stack
+import android.Manifest
+import android.app.Activity
 import kotlin.coroutines.resume
+
 
 @AndroidEntryPoint
 class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
@@ -52,18 +61,23 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
     private lateinit var polygonList:ArrayList<Polygon>
     private var isDrawn=false
     private  var area: Double=0.0
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
 
 
     private val viewModel: CreateNewFieldViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+
 
         latLngList = mutableListOf()
         markerList = mutableListOf()
@@ -85,6 +99,7 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
 
         viewLifecycleOwner.lifecycleScope.launch {
 
@@ -92,8 +107,6 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
             drawAllFields()
 
         }
-
-
 
         binding.drawButton.setOnClickListener {
             isDrawn=true
@@ -155,7 +168,7 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
                     } else {
                         val input = saveConfirmationDialog()
 
-                        if (input.isEmpty()) {
+                        if (input.isEmpty() || input.isBlank()) {
                             Toast.makeText(
                                 requireContext(), "Lütfen tarlanızı isimlendirin",
                                 Toast.LENGTH_SHORT
@@ -236,6 +249,8 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
             }
 
         })
+
+        getCurrentLocation()
      }
 
 
@@ -283,23 +298,6 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
 
     suspend fun check(): Boolean{
 
-        for (polygons in polygonList){
-
-            var pointsInPolgon :List<LatLng> = polygons.points
-
-            for (point in pointsInPolgon){
-
-                if(PolyUtil.containsLocation(point, polygon?.points,true)){
-
-                    Toast.makeText(requireContext(), "Tarlanız başka bir tarlayı içine alamaz.", Toast.LENGTH_SHORT).show()
-
-                    return false
-                }
-
-            }
-
-        }
-
         //Kesişim var mı
         val listAF: List<Field> = allFields.first()
 
@@ -325,10 +323,54 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
                 }
             }
         }
+
+        //Tarlalar iç içe geçiyor mu
+        for (polygons in polygonList){
+
+            var pointsInPolgon :List<LatLng> = polygons.points
+
+            for (point in pointsInPolgon){
+
+                if(PolyUtil.containsLocation(point, polygon?.points,true)){
+
+                    Toast.makeText(requireContext(), "Tarlanız başka bir tarlayı içine alamaz.", Toast.LENGTH_SHORT).show()
+
+                    return false
+                }
+
+            }
+
+        }
+
+
+
         return true
     }
 
+    fun getCurrentLocation(){
 
+        if(ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
+            ActivityCompat.requestPermissions(requireActivity(),arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),101)
+
+            return
+        }
+
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+
+            if (location != null) {
+                val userLatLng = LatLng(location.latitude, location.longitude)
+                val camPos = CameraPosition.Builder()
+                    .target(userLatLng)
+                    .zoom(18F)
+                    .build()
+                val camUpd = CameraUpdateFactory.newCameraPosition(camPos)
+                googleMap.animateCamera(camUpd)
+
+                googleMap.isMyLocationEnabled = true
+            }
+        }
+    }
     suspend fun saveConfirmationDialog(): String = suspendCancellableCoroutine{ cont ->
 
 
@@ -355,6 +397,25 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
         builder.show()
     }
 
+    override fun onResume() {
+        super.onResume()
+        binding.map.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        binding.map.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.map.onDestroy()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        binding.map.onLowMemory()
+    }
 
 }
 
