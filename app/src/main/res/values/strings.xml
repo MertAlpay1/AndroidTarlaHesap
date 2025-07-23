@@ -57,7 +57,7 @@
     <string name="return_login_page_button">Return Login Page</string>
     <string name="login">Login</string>
     <string name="signup_now">Signup Now</string>
-    <string name="yeni_tarla_olustur">Yeni tarla oluştur</string>
+    <string name="yeni_tarla_olustur">Harita ile tarla oluştur</string>
     <string name="alan">Alan:</string>
     <string name="donum_alan">Dönüm :</string>
     <string name="default_m">0 m²</string>
@@ -65,4 +65,8 @@
     <string name="fieldname">FieldName</string>
     <string name="fieldarea">FieldArea</string>
     <string name="mevcut_tarlalariniz">Mevcut Tarlalarınız:</string>
+    <string name="noktalar_arasi_mesafe">Noktalar arasi mesafe :</string>
+    <string name="default_meter">0 m</string>
+    <string name="noktayi_yerlestir">Nokta Yerleştir</string>
+    <string name="konum_ile_tarla_olu_tur">Konum ile tarla oluştur</string>
 </resources>

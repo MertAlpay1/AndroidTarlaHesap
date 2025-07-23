@@ -77,6 +77,8 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
         savedInstanceState: Bundle?
     ): View {
 
+
+
         latLngList = mutableListOf()
         markerList = mutableListOf()
         polygonList= arrayListOf()
@@ -105,12 +107,6 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
             drawAllFields()
 
         }
-
-
-        binding.focusLocationButton.setOnClickListener {
-            getCurrentLocation()
-        }
-
 
         binding.drawButton.setOnClickListener {
             isDrawn=true
@@ -172,7 +168,7 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
                     } else {
                         val input = saveConfirmationDialog()
 
-                        if (input.isEmpty()) {
+                        if (input.isEmpty() || input.isBlank()) {
                             Toast.makeText(
                                 requireContext(), "Lütfen tarlanızı isimlendirin",
                                 Toast.LENGTH_SHORT
@@ -366,12 +362,12 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
                 val userLatLng = LatLng(location.latitude, location.longitude)
                 val camPos = CameraPosition.Builder()
                     .target(userLatLng)
-                    .zoom(13F)
+                    .zoom(18F)
                     .build()
                 val camUpd = CameraUpdateFactory.newCameraPosition(camPos)
                 googleMap.animateCamera(camUpd)
 
-                //googleMap.isMyLocationEnabled = true
+                googleMap.isMyLocationEnabled = true
             }
         }
     }
@@ -401,6 +397,25 @@ class CreateNewFieldFragment : Fragment() , OnMapReadyCallback {
         builder.show()
     }
 
+    override fun onResume() {
+        super.onResume()
+        binding.map.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        binding.map.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.map.onDestroy()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        binding.map.onLowMemory()
+    }
 
 }
 

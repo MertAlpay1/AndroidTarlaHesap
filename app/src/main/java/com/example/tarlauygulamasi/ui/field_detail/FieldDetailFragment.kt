@@ -221,4 +221,24 @@ class FieldDetailFragment : Fragment(), OnMapReadyCallback {
         builder.show()
     }
 
+    override fun onResume() {
+        super.onResume()
+        binding.map.onResume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        binding.map.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.map.onDestroy()
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        binding.map.onLowMemory()
+    }
+
 }

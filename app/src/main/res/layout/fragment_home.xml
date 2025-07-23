@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.home.HomeFragment"
-    android:background="@drawable/login_background">
+    android:background="@drawable/login_background"
+    android:fitsSystemWindows="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -50,10 +51,11 @@
             android:padding="10dp"
             />
         <TextView
+            android:id="@+id/newfieldButtonByWalking"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Boş"
+            android:text="@string/konum_ile_tarla_olu_tur"
             android:background="@drawable/rounded_login_background"
             android:textColor="@color/blue"
             android:textSize="18sp"
