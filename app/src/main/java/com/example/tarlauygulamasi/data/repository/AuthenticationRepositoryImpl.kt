@@ -20,9 +20,9 @@ class AuthenticationRepositoryImpl @Inject constructor(
 
     override fun register(username:String, email:String, password: String): Flow<Resource<Boolean>> = flow  {
         try {
-            val result=auth.createUserWithEmailAndPassword(email,password)
+            val result=auth.createUserWithEmailAndPassword(email,password).await()
 
-            val uid = auth.currentUser?.uid ?: throw Exception("Kullanıcı kimliği oluşturulamadı")
+            val uid = result.user?.uid ?: throw Exception("Kullanıcı kimliği oluşturulamadı")
             val user = User(uid, username, email)
 
             userRepository.insertUser(user)

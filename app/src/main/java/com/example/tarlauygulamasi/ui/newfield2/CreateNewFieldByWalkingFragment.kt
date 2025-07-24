@@ -293,9 +293,7 @@ class CreateNewFieldByWalkingFragment : Fragment(),OnMapReadyCallback{
             return
         }
 
-
         currentPolyline?.remove()
-
 
         val polylineOption= PolylineOptions().addAll(currentLatLngList).color(Color.BLACK).clickable(false)
 

@@ -49,7 +49,6 @@ class LoginFragment : Fragment() {
         binding.eMail.setText(viewModel.loginEmailInput.value ?: "")
         binding.password.setText(viewModel.loginPasswordInput.value ?: "")
 
-
         val auth_Check=viewModel.checkAuth()
         if(auth_Check){
             Log.d("Giriş","Auth çıkmamış")
@@ -58,7 +57,7 @@ class LoginFragment : Fragment() {
 
         //direkt giriş için
         //viewModel.login("mert@gmail.com", "123456")
-        viewModel.login("rifki@gmail.com", "123456")
+        //viewModel.login("rifki@gmail.com", "123456")
 
         binding.loginButton.setOnClickListener {
             val emailText = binding.eMail.text.toString().trim()
