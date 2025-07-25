@@ -17,14 +17,10 @@ class FieldDetailViewModel @Inject constructor(
 
 ): ViewModel() {
 
-
     suspend fun getField(fieldId:Long): Field{
         return getFieldUseCase(fieldId)
     }
     suspend fun updateField(field: Field){
         updateFieldUseCase(field)
     }
-
-
-
 }

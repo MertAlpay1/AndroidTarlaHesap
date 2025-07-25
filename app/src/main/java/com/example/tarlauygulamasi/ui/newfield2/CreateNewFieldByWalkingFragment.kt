@@ -3,6 +3,7 @@ package com.example.tarlauygulamasi.ui.newfield2
 import android.Manifest
 import android.app.AlertDialog
 import android.content.pm.PackageManager
+import android.graphics.BitmapRegionDecoder
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
@@ -34,15 +35,18 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapView
 import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.common.base.Objects
 import com.google.maps.android.SphericalUtil
+import com.google.maps.android.ui.IconGenerator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -333,6 +337,42 @@ class CreateNewFieldByWalkingFragment : Fragment(),OnMapReadyCallback{
         isDrawn=true
 
         binding.areaDonum.text = String.format("%.2f dönüm", donumArea)
+    }
+
+    fun drawMarker(){
+
+        markerList.forEach { marker ->
+            marker?.remove()
+        }
+
+        for(i in 0 until  latLngList.size-1){
+
+            val distance = SphericalUtil.computeDistanceBetween(latLngList[i], latLngList[i+1]).toFormattedMeter()
+            val lat:Double=(latLngList[i].latitude+latLngList[i+1].latitude)/2
+            val lng:Double=(latLngList[i].longitude+latLngList[i+1].longitude)/2
+
+            val iconGenerator= IconGenerator(requireContext())
+            iconGenerator.setColor(Color.RED)
+            iconGenerator.setTextAppearance(R.style.markerTextStyle)
+
+            val icon=iconGenerator.makeIcon("aaa")
+
+            val latLng= LatLng(lat,lng)
+
+            val markerOptions= MarkerOptions()
+                .position(latLng)
+                .icon(BitmapDescriptorFactory.fromBitmap(icon))
+                .snippet(distance)
+
+            googleMap.addMarker(markerOptions)
+
+
+
+
+
+        }
+
+
     }
 
 

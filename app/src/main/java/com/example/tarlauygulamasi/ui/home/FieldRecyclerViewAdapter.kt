@@ -7,6 +7,8 @@ import android.widget.Filter
 import android.widget.Filterable
 import androidx.appcompat.view.menu.MenuView
 import androidx.lifecycle.model.AdapterClass
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tarlauygulamasi.data.locale.entity.Field
 import com.example.tarlauygulamasi.databinding.FieldItemViewBinding
@@ -19,7 +21,22 @@ class FieldRecyclerViewAdapter(
     private val onItemLongClick: (Field) -> Unit,
 ) : RecyclerView.Adapter<FieldRecyclerViewAdapter.FieldViewHolder>(), Filterable {
 
-    private var filteredFieldList = listOf<Field>()
+    private val diffUtil=object : DiffUtil.ItemCallback<Field>(){
+        override fun areItemsTheSame(
+            oldItem: Field,
+            newItem: Field
+        ): Boolean {
+            return oldItem.id==newItem.id
+        }
+
+        override fun areContentsTheSame(
+            oldItem: Field,
+            newItem: Field
+        ): Boolean {
+            return oldItem==newItem
+        }
+    }
+    private var asyncListDiffer = AsyncListDiffer(this, diffUtil)
 
     inner class FieldViewHolder(val binding: FieldItemViewBinding)
         : RecyclerView.ViewHolder(binding.root)
@@ -30,7 +47,7 @@ class FieldRecyclerViewAdapter(
     }
 
     override fun onBindViewHolder(holder: FieldViewHolder, position: Int) {
-        val item = filteredFieldList[position]
+        val item = asyncListDiffer.currentList[position]
         holder.binding.FieldName.text = item.name
         holder.binding.FieldArea.text = item.area.toFormattedArea()
 
@@ -44,13 +61,19 @@ class FieldRecyclerViewAdapter(
     }
 
     override fun getItemCount(): Int {
-        return filteredFieldList.size
+        return asyncListDiffer.currentList.size
     }
     fun updateFields(newList: List<Field>) {
         fieldList = newList
-        filteredFieldList = newList
-        notifyDataSetChanged()
+        asyncListDiffer.submitList(newList)
     }
+
+    fun isFilteredFieldEmpty(): Boolean{
+
+        return asyncListDiffer.currentList.isEmpty()
+    }
+
+
 
     override fun getFilter(): Filter? {
 
@@ -72,11 +95,11 @@ class FieldRecyclerViewAdapter(
             }
 
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                filteredFieldList=results?.values as List<Field>
-                notifyDataSetChanged()
+                val filteredList  =results?.values as List<Field>
+                asyncListDiffer.submitList(filteredList)
             }
         }
     }
-
-
 }
+
+//diffutil.
