@@ -1,4 +1,4 @@
-package com.example.tarlauygulamasi.ui.newfield2
+package com.example.tarlauygulamasi.ui.newfieldbywalking
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

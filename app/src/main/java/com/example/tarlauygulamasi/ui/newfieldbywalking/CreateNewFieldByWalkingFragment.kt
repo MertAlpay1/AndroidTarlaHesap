@@ -1,11 +1,11 @@
-package com.example.tarlauygulamasi.ui.newfield2
+package com.example.tarlauygulamasi.ui.newfieldbywalking
 
 import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
+import android.content.IntentSender
 import android.content.pm.PackageManager
-import android.graphics.BitmapRegionDecoder
 import android.graphics.Color
-import android.location.Location
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,23 +13,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
-import androidx.annotation.RequiresPermission
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.tarlauygulamasi.R
 import com.example.tarlauygulamasi.data.locale.entity.Field
-import com.example.tarlauygulamasi.databinding.FragmentCreateNewFieldBinding
 import com.example.tarlauygulamasi.databinding.FragmentCreateNewFieldByWalkingBinding
-import com.example.tarlauygulamasi.ui.newfield.CreateNewFieldViewModel
 import com.example.tarlauygulamasi.util.FieldEditStack
 import com.example.tarlauygulamasi.util.toFormattedMeter
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -44,7 +46,6 @@ import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.common.base.Objects
 import com.google.maps.android.SphericalUtil
 import com.google.maps.android.ui.IconGenerator
 import dagger.hilt.android.AndroidEntryPoint
@@ -80,10 +81,15 @@ class CreateNewFieldByWalkingFragment : Fragment(),OnMapReadyCallback{
     private var lastLocation: LatLng? = null
 
     private var isDrawn=false
+    private var isTrackingEnabled=true
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
+
+    private lateinit var locationSettingsLauncher: ActivityResultLauncher<IntentSenderRequest>
+
+
 
     private  var area: Double=0.0
 
@@ -116,6 +122,27 @@ class CreateNewFieldByWalkingFragment : Fragment(),OnMapReadyCallback{
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        requestTurnOnLocation()
+
+        locationSettingsLauncher = registerForActivityResult(
+            ActivityResultContracts.StartIntentSenderForResult()
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                Toast.makeText(requireContext(), "Konum  açıldı", Toast.LENGTH_SHORT).show()
+
+                fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+                googleMap.isMyLocationEnabled = true
+
+                getCurrentLocationAndMoveCamera()
+                updateLocation()
+
+            } else {
+                Toast.makeText(requireContext(), "Konum açılmadı ana menüye dönülüyor.", Toast.LENGTH_SHORT).show()
+                findNavController().navigate(R.id.action_createNewFieldByWalkingFragment_to_homeFragment)
+            }
+        }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
@@ -161,6 +188,8 @@ class CreateNewFieldByWalkingFragment : Fragment(),OnMapReadyCallback{
 
                 drawAllPolyLine()
 
+                drawMarker()
+
                 currentPolyline?.remove()
                 currentPolyline = null
 
@@ -177,6 +206,13 @@ class CreateNewFieldByWalkingFragment : Fragment(),OnMapReadyCallback{
                     var lastIndex = latLngList.size - 1
 
                     latLngList.removeAt(lastIndex)
+
+                    if(markerList.isNotEmpty()){
+                        val markerLastIndex=markerList.size-1
+                        val marker = markerList.removeAt(markerLastIndex)
+                        marker?.remove()
+
+                    }
 
                     if(latLngList.isNotEmpty()){
                         //En son noktayı işlemlere al
@@ -199,6 +235,8 @@ class CreateNewFieldByWalkingFragment : Fragment(),OnMapReadyCallback{
                     areaPolygon?.remove()
 
                     currentPolyline?.remove()
+
+                    drawMarker()
                     drawAllPolyLine()
                 }
 
@@ -264,6 +302,19 @@ class CreateNewFieldByWalkingFragment : Fragment(),OnMapReadyCallback{
         googleMap=gMap
 
         getCurrentLocationAndMoveCamera()
+
+        googleMap.setOnCameraMoveStartedListener { reason ->
+            if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                isTrackingEnabled = false
+            }
+        }
+
+        googleMap.setOnMyLocationButtonClickListener {
+            isTrackingEnabled = true
+            false
+        }
+
+
     }
 
     fun drawAllPolyLine(){
@@ -341,34 +392,39 @@ class CreateNewFieldByWalkingFragment : Fragment(),OnMapReadyCallback{
 
     fun drawMarker(){
 
+        if(latLngList.size<2) return
+
         markerList.forEach { marker ->
             marker?.remove()
         }
 
+        markerList.clear()
+
         for(i in 0 until  latLngList.size-1){
+
 
             val distance = SphericalUtil.computeDistanceBetween(latLngList[i], latLngList[i+1]).toFormattedMeter()
             val lat:Double=(latLngList[i].latitude+latLngList[i+1].latitude)/2
             val lng:Double=(latLngList[i].longitude+latLngList[i+1].longitude)/2
 
+            val latLng= LatLng(lat,lng)
+
             val iconGenerator= IconGenerator(requireContext())
-            iconGenerator.setColor(Color.RED)
+            iconGenerator.setColor(Color.WHITE)
             iconGenerator.setTextAppearance(R.style.markerTextStyle)
 
-            val icon=iconGenerator.makeIcon("aaa")
+            val iconBitmap = iconGenerator.makeIcon(distance)
 
-            val latLng= LatLng(lat,lng)
+
 
             val markerOptions= MarkerOptions()
                 .position(latLng)
-                .icon(BitmapDescriptorFactory.fromBitmap(icon))
+                .icon(BitmapDescriptorFactory.fromBitmap(iconBitmap))
+                .title("Mesafe")
                 .snippet(distance)
 
-            googleMap.addMarker(markerOptions)
-
-
-
-
+            val marker = googleMap.addMarker(markerOptions)
+            marker?.let { markerList.add(it) }
 
         }
 
@@ -390,6 +446,10 @@ class CreateNewFieldByWalkingFragment : Fragment(),OnMapReadyCallback{
 
                 val location = result.lastLocation ?: return
                 val userLatLng = LatLng(location.latitude, location.longitude)
+
+                if(isTrackingEnabled) {
+                    followUserLocation(userLatLng)
+                }
 
                 lastLocation=userLatLng
 
@@ -434,6 +494,13 @@ class CreateNewFieldByWalkingFragment : Fragment(),OnMapReadyCallback{
         }
     }
 
+    private fun followUserLocation(latLng: LatLng) {
+        val cameraPosition = CameraPosition.Builder()
+            .target(latLng)
+            .zoom(18F)
+            .build()
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+    }
 
     suspend fun saveConfirmationDialog(): String = suspendCancellableCoroutine{ cont ->
 
@@ -459,6 +526,33 @@ class CreateNewFieldByWalkingFragment : Fragment(),OnMapReadyCallback{
         builder.create()
 
         builder.show()
+    }
+    private fun requestTurnOnLocation() {
+
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
+            .setMinUpdateIntervalMillis(5000)
+            .build()
+
+        val builder = LocationSettingsRequest.Builder()
+            .addLocationRequest(locationRequest)
+            .setAlwaysShow(true)
+
+        val client = LocationServices.getSettingsClient(requireActivity())
+        val task = client.checkLocationSettings(builder.build())
+
+        task.addOnSuccessListener {
+
+        }
+
+        task.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException) {
+                try {
+                    val intentSenderRequest = IntentSenderRequest.Builder(exception.resolution).build()
+                    locationSettingsLauncher.launch(intentSenderRequest)
+                } catch (sendEx: IntentSender.SendIntentException) {
+                }
+            }
+        }
     }
 
 

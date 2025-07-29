@@ -109,10 +109,6 @@ class HomeFragment : Fragment() {
             override fun onQueryTextChange(newText: String?): Boolean {
                 adapter.filter?.filter(newText)
 
-                    val isFilteredListEmpty=adapter.isFilteredFieldEmpty()
-                    if(isFilteredListEmpty) binding.emptySearchText.visibility = View.VISIBLE
-                    else binding.emptySearchText.visibility = View.GONE
-
                 return true
             }
 
