@@ -9,6 +9,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.SearchView
@@ -65,6 +66,9 @@ class HomeFragment : Fragment() {
 
         }
 
+        binding.emptyTextShow.visibility = View.GONE
+        binding.emptySearchText.visibility = View.GONE
+
         val fieldList:Flow<List<Field>> =viewModel.getUserField()
 
         val adapter = FieldRecyclerViewAdapter(onItemClick = { field ->
@@ -82,20 +86,32 @@ class HomeFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.getUserField().collect { fieldList ->
+                if(fieldList.isEmpty()){
+                        binding.emptyTextShow.visibility = View.VISIBLE
+                    return@collect
+                }
+                else{
+                    binding.emptyTextShow.visibility = View.GONE
+                }
                 adapter.updateFields(fieldList)
-
             }
         }
+
+        binding.searchView.setOnClickListener {
+            binding.searchView.isIconified = false
+        }
+
 
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
             }
-
             override fun onQueryTextChange(newText: String?): Boolean {
                 adapter.filter?.filter(newText)
+
                 return true
             }
+
         })
 
 

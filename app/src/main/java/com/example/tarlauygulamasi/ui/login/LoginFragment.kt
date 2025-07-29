@@ -92,7 +92,8 @@ class LoginFragment : Fragment() {
                 }
 
                 is Resource.Error -> {
-                    Toast.makeText(requireContext(), result.message ?: "Hata", Toast.LENGTH_SHORT).show()
+                    Log.d("Login Failure",result.message.toString())
+                    Toast.makeText(requireContext(), "Yanlış e-posta veya şifre", Toast.LENGTH_SHORT).show()
                 }
 
                 is Resource.Loading -> {

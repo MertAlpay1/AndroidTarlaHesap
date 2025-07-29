@@ -83,6 +83,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/Fieldlist"
+        android:clickable="true"
         android:id="@+id/searchView"
         android:queryHint="Tarla ara..."
         android:layout_marginStart="16dp"
@@ -90,10 +91,36 @@
         android:layout_marginBottom="8dp"
         android:background="@drawable/rounded_login_background" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Aktif bir tarlanız bulunmamaktadır..."
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:layout_below="@id/searchView"
+        android:gravity="center"
+        android:id="@+id/emptyTextShow"
+        android:layout_margin="5dp"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Böyle bir tarla bulunamadı..."
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:layout_below="@id/emptyTextShow"
+        android:gravity="center"
+        android:id="@+id/emptySearchText"
+        android:layout_margin="5dp"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/searchView"
+        android:layout_below="@id/emptySearchText"
         android:id="@+id/fieldRecyclerView"/>
 
 

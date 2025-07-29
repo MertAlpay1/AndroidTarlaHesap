@@ -73,7 +73,7 @@
     </fragment>
     <fragment
         android:id="@+id/createNewFieldByWalkingFragment"
-        android:name="com.example.tarlauygulamasi.ui.newfield2.CreateNewFieldByWalkingFragment"
+        android:name="com.example.tarlauygulamasi.ui.newfieldbywalking.CreateNewFieldByWalkingFragment"
         android:label="fragment_create_new_field_by_walking"
         tools:layout="@layout/fragment_create_new_field_by_walking" >
         <action
